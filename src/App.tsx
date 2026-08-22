@@ -44,6 +44,8 @@ const ASSET = 'ACME'
 const SCALE = 100_000_000
 const TOTAL_SUPPLY = 1_000_000_000
 const MINT_PRICE_SATS = 1
+const MIN_MINT_ACME = 330
+const MIN_MINT_RAW = MIN_MINT_ACME * SCALE
 
 const TOKENOMICS = [
   { label: 'Open Mint', percent: 30, summary: 'Public launch', details: 'Mint at 1 sat on a first-come, first-served basis. No VC allocation and no presale.', className: 'alloc-open' },
@@ -126,6 +128,11 @@ interface AcmeContext {
 function formatNumber(value: number | null | undefined, decimals = 0): string {
   if (value === null || value === undefined || Number.isNaN(value)) return '--'
   return value.toLocaleString(undefined, { maximumFractionDigits: decimals })
+}
+
+function qtyRawFromInput(value: string): number {
+  const quantity = Number(value)
+  return Number.isFinite(quantity) ? Math.floor(quantity * SCALE) : 0
 }
 
 function formatSats(value: number | null | undefined): string {
@@ -277,7 +284,14 @@ function MintDesk({ ctx }: { ctx: AcmeContext }) {
         <>
           <label>
             Amount
-            <input value={quantity} onChange={(event) => setQuantity(event.target.value.replace(/[^\d.]/g, ''))} />
+            <input
+              type="number"
+              min={MIN_MINT_ACME}
+              step="1"
+              inputMode="decimal"
+              value={quantity}
+              onChange={(event) => setQuantity(event.target.value.replace(/[^\d.]/g, ''))}
+            />
           </label>
           <div className="mint-readout">
             <span>Wallet</span>
@@ -287,6 +301,9 @@ function MintDesk({ ctx }: { ctx: AcmeContext }) {
             <span>YOU RECEIVE</span>
             <strong>{formatNumber(Number(quantity) || 0, 8)} ACME</strong>
           </div>
+          {quantity && qtyRawFromInput(quantity) > 0 && qtyRawFromInput(quantity) < MIN_MINT_RAW && (
+            <p className="danger">Minimum mint amount is {formatNumber(MIN_MINT_ACME)} ACME.</p>
+          )}
           <label>
             Fee rate
             <input type="number" min="0.01" step="0.01" value={feeRate} onChange={(event) => setFeeRate(Number(event.target.value))} />
@@ -1073,7 +1090,7 @@ export default function App() {
   const stakingConfig = getStakingNetworkConfig()
   const [activeTab, setActiveTab] = useState<TabKey>('invest')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [quantity, setQuantity] = useState('100')
+  const [quantity, setQuantity] = useState(String(MIN_MINT_ACME))
   const [feeRate, setFeeRate] = useState(5)
   const [mintStatus, setMintStatus] = useState<MintStatus>('idle')
   const [mintMessage, setMintMessage] = useState<string | null>(null)
@@ -1191,13 +1208,14 @@ export default function App() {
     : 0
   const pricing = minter ? getOpenMinterPricingInfo(minter) : null
   const qtyHuman = Number(quantity)
-  const qtyRaw = Number.isFinite(qtyHuman) ? Math.floor(qtyHuman * SCALE) : 0
+  const qtyRaw = qtyRawFromInput(quantity)
   const maxRaw = minter ? getEffectiveMaxMintRaw(minter, allowanceState.allowance.remainingRaw) : 0
   const overMax = qtyRaw > maxRaw
+  const underMin = qtyRaw > 0 && qtyRaw < MIN_MINT_RAW
   const cost = minter && qtyRaw > 0
     ? Math.ceil(qtyHuman / (minter.quantity_by_price / SCALE)) * minter.price
     : 0
-  const canMint = wallet.connected && minter && qtyRaw > 0 && !overMax && !allowanceState.isBlocked && mintStatus !== 'composing' && mintStatus !== 'signing' && mintStatus !== 'broadcasting'
+  const canMint = wallet.connected && minter && qtyRaw >= MIN_MINT_RAW && !overMax && !allowanceState.isBlocked && mintStatus !== 'composing' && mintStatus !== 'signing' && mintStatus !== 'broadcasting'
 
   const handleMint = async () => {
     if (!wallet.address || !minter) return
@@ -1205,6 +1223,7 @@ export default function App() {
     setTxid(null)
     setMintStatus('composing')
     try {
+      if (underMin) throw new Error(`Minimum mint amount is ${formatNumber(MIN_MINT_ACME)} ACME.`)
       if (overMax) throw new Error('Quantity is above the mintable maximum.')
       const utxos = await wallet.getUtxos()
       if (utxos.length === 0) throw new Error('No UTXOs available in the connected wallet.')
