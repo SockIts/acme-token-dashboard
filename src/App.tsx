@@ -74,6 +74,14 @@ const ROADMAP_ARC = [
   { step: '04', title: 'DAO', note: 'Open validators and community control over fees, upgrades, reserves, and grants.' },
 ] as const
 
+const SHAREHOLDER_TIERS = [
+  { key: 'basic', name: 'Basic', range: '0 - 50,000', min: 0, max: 50_000, className: 'tier-basic' },
+  { key: 'sky', name: 'Sky Blue', range: '50,001 - 250K', min: 50_001, max: 249_999, className: 'tier-sky' },
+  { key: 'gold', name: 'Gold Bar', range: '250K - 1M', min: 250_000, max: 999_999, className: 'tier-gold' },
+  { key: 'diamond', name: 'Diamond', range: '1M - 10M', min: 1_000_000, max: 9_999_999, className: 'tier-diamond' },
+  { key: 'black', name: 'Black Card', range: '10M+', min: 10_000_000, max: Infinity, className: 'tier-black' },
+] as const
+
 type MintStatus = 'idle' | 'composing' | 'signing' | 'broadcasting' | 'success' | 'error'
 type TabKey = 'invest' | 'portfolio' | 'programs' | 'reports' | 'manifesto'
 type DeskMode = 'mint' | 'stake' | 'dex'
@@ -138,6 +146,10 @@ function qtyRawFromInput(value: string): number {
 function formatMintInputRaw(quantity: number): string {
   const value = quantity / SCALE
   return Number.isInteger(value) ? String(value) : value.toFixed(8).replace(/0+$/, '').replace(/\.$/, '')
+}
+
+function getShareholderTier(balance: number) {
+  return SHAREHOLDER_TIERS.find((tier) => balance >= tier.min && balance <= tier.max) ?? SHAREHOLDER_TIERS[0]
 }
 
 function formatSats(value: number | null | undefined): string {
@@ -680,6 +692,7 @@ function StakingDesk({ ctx }: { ctx: AcmeContext }) {
 }
 
 function ProgramsPage({ ctx }: { ctx: AcmeContext }) {
+  const activeTier = getShareholderTier(ctx.walletAcmeWhole)
   const programs = [
     ['Kek.Works', 'Generative PFP collections', 'A launch studio for creating generative PFP collections on ACME, from trait assembly through mint-ready collection drops.'],
     ['Artcore Directory Studio', 'Generative ACME art', 'A creation environment for generative ACME art, giving artists a structured path to publish coded collections and on-chain editions.'],
@@ -701,17 +714,32 @@ function ProgramsPage({ ctx }: { ctx: AcmeContext }) {
 
       <WindowPanel title="SHAREHOLDER CARD">
         <div className="shareholder-card">
-          <div className="card-art">
-            <span>ACME CAPITAL</span>
-            <strong>{ctx.wallet.connected ? 'Connected' : 'Passbook'}</strong>
-            <em>A position, duly opened.</em>
-            <dl>
-              <div><dt>HOLDINGS</dt><dd>{formatNumber(ctx.walletAcmeWhole, 4)} ACME</dd></div>
-              <div><dt>STANDING</dt><dd>{ctx.wallet.connected ? 'Live' : '0'}</dd></div>
-              <div><dt>PROGRAMS</dt><dd>5</dd></div>
-            </dl>
-            <small>{shortAddress(ctx.wallet.address)}</small>
-            <span className="card-logo">ACME</span>
+          <div className="card-display">
+            <div className={`card-art ${activeTier.className}`}>
+              <span>ACME CAPITAL</span>
+              <strong>{activeTier.name}</strong>
+              <em>{ctx.wallet.connected ? `${activeTier.range} ACME holder tier` : 'Connect wallet to reveal your tier'}</em>
+              <dl>
+                <div><dt>HOLDINGS</dt><dd>{formatNumber(ctx.walletAcmeWhole, 4)} ACME</dd></div>
+                <div><dt>STANDING</dt><dd>{ctx.wallet.connected ? activeTier.name : '0'}</dd></div>
+                <div><dt>PROGRAMS</dt><dd>5</dd></div>
+              </dl>
+              <small>{shortAddress(ctx.wallet.address)}</small>
+              <span className="card-logo">ACME</span>
+            </div>
+            <div className="card-tier-strip" aria-label="Shareholder card tiers">
+              {SHAREHOLDER_TIERS.map((tier) => (
+                <button
+                  type="button"
+                  key={tier.key}
+                  className={`tier-thumb ${tier.className} ${tier.key === activeTier.key ? 'active' : ''}`}
+                  aria-pressed={tier.key === activeTier.key}
+                >
+                  <span>{tier.name}</span>
+                  <small>{tier.range}</small>
+                </button>
+              ))}
+            </div>
           </div>
           <div className="program-list">
             {programs.map(([name, kind, detail]) => (
