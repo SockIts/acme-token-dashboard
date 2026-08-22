@@ -135,6 +135,11 @@ function qtyRawFromInput(value: string): number {
   return Number.isFinite(quantity) ? Math.floor(quantity * SCALE) : 0
 }
 
+function formatMintInputRaw(quantity: number): string {
+  const value = quantity / SCALE
+  return Number.isInteger(value) ? String(value) : value.toFixed(8).replace(/0+$/, '').replace(/\.$/, '')
+}
+
 function formatSats(value: number | null | undefined): string {
   if (value === null || value === undefined) return '--'
   return value >= SCALE ? `${formatNumber(value / SCALE, 8)} BTC` : `${formatNumber(value)} sats`
@@ -267,6 +272,7 @@ function WindowPanel({ title, children, className = '' }: { title: string; child
 function MintDesk({ ctx }: { ctx: AcmeContext }) {
   const { wallet, minter, quantity, setQuantity, feeRate, setFeeRate, cost, allowanceState, overMax, maxRaw, mintStatus, mintMessage, txid, canMint, handleMint } = ctx
   const [deskMode, setDeskMode] = useState<DeskMode>('mint')
+  const maxMintQuantity = formatMintInputRaw(minter?.max_mint_per_tx ?? 0)
 
   if (!minter) {
     return <p className="muted">No active ACME token minter is available right now.</p>
@@ -319,9 +325,14 @@ function MintDesk({ ctx }: { ctx: AcmeContext }) {
           {overMax && <p className="danger">Max mintable now is {formatOpenMinterQuantity(maxRaw, true)} ACME.</p>}
           {allowanceState.blockedReason && <p className="danger">{allowanceState.blockedReason}</p>}
           {!wallet.connected && <p className="muted">Connect account to activate mint controls.</p>}
-          <button type="button" className="mint-button mint-submit" disabled={!canMint} onClick={() => void handleMint()}>
-            {mintStatus === 'composing' ? 'Composing...' : mintStatus === 'signing' ? 'Awaiting signature...' : mintStatus === 'broadcasting' ? 'Broadcasting...' : 'Mint ACME'}
-          </button>
+          <div className="mint-action-row">
+            <button type="button" className="mint-button mint-submit" disabled={!canMint} onClick={() => void handleMint()}>
+              {mintStatus === 'composing' ? 'Composing...' : mintStatus === 'signing' ? 'Awaiting signature...' : mintStatus === 'broadcasting' ? 'Broadcasting...' : 'Mint ACME'}
+            </button>
+            <button type="button" className="mint-max-button" onClick={() => setQuantity(maxMintQuantity)} aria-label={`Set amount to max ${formatOpenMinterQuantity(minter.max_mint_per_tx, true)} ACME`}>
+              Max
+            </button>
+          </div>
           {mintMessage && <p className={mintStatus === 'error' ? 'danger' : 'success'}>{mintMessage}</p>}
           {txid && <a className="tx-link" href={`https://mempool.space/tx/${txid}`} target="_blank" rel="noreferrer">View transaction</a>}
         </>

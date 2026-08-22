@@ -3813,12 +3813,40 @@ fieldset input,
   line-height: 0.95;
 }
 
+.mint-action-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
 .shareholder-desk .mint-button.mint-submit {
   width: min(360px, 100%);
   min-height: 54px;
   justify-self: start;
   padding: 9px 24px;
   font-size: 15px;
+}
+
+.mint-max-button {
+  flex: 0 0 54px;
+  width: 54px;
+  min-height: 54px;
+  border: 2px solid var(--ink);
+  background: repeating-linear-gradient(45deg, rgba(255, 176, 90, 0.18) 0 2px, transparent 2px 4px), var(--paper-light);
+  color: var(--ink);
+  box-shadow:
+    inset 2px 2px 0 #fff2c8,
+    inset -2px -2px 0 #8d311d,
+    3px 3px 0 var(--shadow);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.mint-max-button:hover {
+  background: repeating-linear-gradient(45deg, rgba(255, 176, 90, 0.26) 0 2px, transparent 2px 4px), #ffd78e;
 }
 
 @media (max-width: 640px) {
@@ -4112,10 +4140,21 @@ fieldset input,
   }
 
   .shareholder-desk .mint-button.mint-submit {
-    width: min(270px, 100%);
+    width: min(270px, calc(100% - 48px));
     min-height: 40px;
     padding: 7px 16px;
     font-size: 12px;
+  }
+
+  .mint-action-row {
+    gap: 8px;
+  }
+
+  .mint-max-button {
+    flex-basis: 40px;
+    width: 40px;
+    min-height: 40px;
+    font-size: 10px;
   }
 
   .stake-input-row,
