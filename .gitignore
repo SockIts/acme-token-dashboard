@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.DS_Store
+.openclaw-run/
+test-results/
+
+*.log
+dashboard-*.png
