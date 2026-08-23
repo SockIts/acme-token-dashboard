@@ -137,7 +137,7 @@ h1 {
   padding: 2px;
 }
 
-.tabs button, .win-button, .wallet-chip button {
+.tabs button, .win-button {
   border: 2px solid var(--ink);
   background: var(--paper);
   color: var(--ink);
@@ -147,7 +147,7 @@ h1 {
   cursor: pointer;
 }
 
-.tabs button:hover, .win-button:hover, .wallet-chip button:hover {
+.tabs button:hover, .win-button:hover {
   background:
     repeating-linear-gradient(45deg, rgba(8, 18, 13, 0.1) 0 2px, transparent 2px 4px),
     var(--paper-light);
@@ -221,16 +221,18 @@ h1 {
   color: #a80000;
 }
 
-.wallet-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--paper);
-  border: 2px solid var(--ink);
-  color: var(--ink);
-  box-shadow: inset 2px 2px 0 var(--paper-light), inset -2px -2px 0 var(--paper-dark);
-  padding: 3px;
-  font-size: 12px;
+.wallet-disconnect-label {
+  display: none;
+}
+
+.wallet-disconnect-button:hover .wallet-address-label,
+.wallet-disconnect-button:focus-visible .wallet-address-label {
+  display: none;
+}
+
+.wallet-disconnect-button:hover .wallet-disconnect-label,
+.wallet-disconnect-button:focus-visible .wallet-disconnect-label {
+  display: inline;
 }
 
 .window {
@@ -1212,7 +1214,7 @@ legend {
     text-align: left;
   }
 
-  .wallet-connect, .wallet-chip {
+  .wallet-connect {
     margin-top: 12px;
     width: max-content;
   }
@@ -1314,7 +1316,6 @@ body::after {
 .window,
 .portfolio-strip,
 .terminal-footer,
-.wallet-chip,
 .wallet-menu {
   background:
     radial-gradient(circle at 20% 0%, rgba(255, 248, 223, 0.82), transparent 18rem),
@@ -1382,7 +1383,6 @@ h1 {
 
 .tabs button,
 .win-button,
-.wallet-chip button,
 .mode-tabs button,
 .staking-actions button {
   background:
@@ -1397,7 +1397,6 @@ h1 {
 
 .tabs button:hover,
 .win-button:hover,
-.wallet-chip button:hover,
 .mode-tabs button:hover {
   background:
     repeating-linear-gradient(-45deg, rgba(239, 75, 53, 0.16) 0 3px, transparent 3px 8px),
@@ -1887,8 +1886,7 @@ table tbody tr:nth-child(even) {
     margin-left: 0;
   }
 
-  .wallet-connect,
-  .wallet-chip {
+  .wallet-connect {
     width: 100%;
     max-width: 100%;
   }
@@ -1962,7 +1960,6 @@ body {
 
 .tabs button:hover,
 .win-button:hover,
-.wallet-chip button:hover,
 .mode-tabs button:hover,
 .staking-actions button:hover,
 .stake-actions button:hover,
@@ -2416,7 +2413,6 @@ input {
 .window,
 .portfolio-strip,
 .terminal-footer,
-.wallet-chip,
 .wallet-menu {
   background: #c5c5c5;
   background-image:
@@ -2516,7 +2512,6 @@ h1 {
 
 .tabs button,
 .win-button,
-.wallet-chip button,
 .mode-tabs button,
 .staking-actions button,
 .mint-button {
@@ -2538,7 +2533,6 @@ h1 {
 
 .tabs button:hover,
 .win-button:hover,
-.wallet-chip button:hover,
 .mode-tabs button:hover,
 .staking-actions button:hover,
 .mint-button:hover:not(:disabled) {
@@ -2615,12 +2609,6 @@ h1 {
   width: 22px;
   height: 22px;
   object-fit: cover;
-}
-
-.wallet-chip {
-  gap: 4px;
-  padding: 2px;
-  font-size: 10px;
 }
 
 .window {
@@ -3169,8 +3157,7 @@ table tbody tr:nth-child(even) {
     grid-template-columns: 1fr;
   }
 
-  .wallet-connect,
-  .wallet-chip {
+  .wallet-connect {
     width: 100%;
     max-width: 100%;
   }
@@ -3234,7 +3221,6 @@ body {
 
 .tabs button:hover,
 .win-button:hover,
-.wallet-chip button:hover,
 .mode-tabs button:hover,
 .staking-actions button:hover,
 .stake-actions button:hover,
@@ -4220,8 +4206,7 @@ fieldset input,
   }
 
   .mobile-menu button,
-  .mobile-menu .win-button,
-  .mobile-menu .wallet-chip button {
+  .mobile-menu .win-button {
     width: 100%;
     min-height: 30px;
     padding: 4px 6px;
@@ -4238,8 +4223,7 @@ fieldset input,
     background: linear-gradient(var(--green-light) 0 48%, var(--green-dark) 48%), var(--green-dark);
   }
 
-  .mobile-menu .wallet-connect,
-  .mobile-menu .wallet-chip {
+  .mobile-menu .wallet-connect {
     grid-column: 1 / -1;
     width: 100%;
     margin: 0;
@@ -4535,7 +4519,6 @@ fieldset input,
   }
 }
 
-.wallet-chip span,
 .wallet-error,
 .mint-readout strong,
 .buy-modal-body td,
@@ -4575,15 +4558,6 @@ fieldset input,
     overflow-y: auto;
   }
 
-  .wallet-chip {
-    justify-content: space-between;
-  }
-
-  .wallet-chip span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 
   .buy-modal-actions a,
   .buy-modal-actions button {
@@ -4656,26 +4630,54 @@ fieldset input,
 }
 
 .side-wallet .wallet-connect,
-.side-wallet .wallet-chip,
 .side-wallet .win-button {
   width: 100%;
 }
 
-.side-wallet .win-button,
-.side-wallet .wallet-chip button {
+.side-wallet .win-button {
   padding-inline: 6px;
   text-align: center;
 }
 
-.side-wallet .wallet-chip {
-  display: grid;
-  gap: 5px;
-}
-
-.side-wallet .wallet-chip span {
+.wallet-disconnect-button span {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.wallet-disconnect-button {
+  color: var(--paper-light);
+  background:
+    linear-gradient(var(--green-light) 0 48%, var(--green-dark) 48%),
+    var(--green-dark);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.24),
+    inset -2px -2px 0 rgba(24, 20, 17, 0.48),
+    3px 3px 0 var(--soft-shadow);
+  text-shadow: 1px 1px 0 var(--ink);
+}
+
+.wallet-disconnect-button:hover,
+.wallet-disconnect-button:focus-visible {
+  color: var(--paper-light);
+  background:
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.16) 0 3px, transparent 3px 8px),
+    #7d2416;
+}
+
+.wallet-disconnect-button .wallet-disconnect-label {
+  display: none;
+}
+
+.wallet-disconnect-button:hover .wallet-address-label,
+.wallet-disconnect-button:focus-visible .wallet-address-label {
+  display: none;
+}
+
+.wallet-disconnect-button:hover .wallet-disconnect-label,
+.wallet-disconnect-button:focus-visible .wallet-disconnect-label {
+  display: block;
 }
 
 .side-wallet .wallet-menu {
@@ -4684,6 +4686,10 @@ fieldset input,
   top: calc(100% + 6px);
   width: min(280px, calc(100vw - 28px));
   z-index: 40;
+}
+
+.mobile-nav-wallet {
+  display: none;
 }
 
 .side-brand {
@@ -5290,16 +5296,14 @@ fieldset input,
 
   .side-column {
     order: 2;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    gap: 6px;
+    display: block;
     align-self: end;
     max-height: none;
     overflow: visible;
   }
 
   .side-nav {
-    grid-template-columns: 58px repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 4px;
     padding: 5px;
     box-shadow: inset 2px 2px 0 #f6efe3, inset -2px -2px 0 #786d60;
@@ -5314,57 +5318,95 @@ fieldset input,
   }
 
   .side-wallet {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    padding: 5px;
-    overflow: visible;
-    box-shadow: inset 2px 2px 0 #f6efe3, inset -2px -2px 0 #786d60;
-  }
-
-  .side-wallet > span {
-    font-size: 9px;
-  }
-
-  .side-wallet .win-button,
-  .side-wallet .wallet-chip button {
-    min-height: 30px;
-    padding-inline: 4px;
-    font-size: 9px;
-    line-height: 1.05;
-  }
-
-  .side-wallet .wallet-menu {
-    position: absolute;
-    top: auto;
-    bottom: calc(100% + 5px);
-    left: 0;
-    right: 0;
-    width: 100%;
-    max-width: none;
-    margin-top: 0;
+    display: none;
   }
 
   .side-brand {
-    min-height: 34px;
-    padding: 6px;
-  }
-
-  .side-brand span {
-    font-size: 14px;
-  }
-
-  .side-brand strong {
-    font-size: 9px;
+    display: none;
   }
 
   .side-nav button,
   .side-nav a {
+    min-width: 0;
     min-height: 34px;
     padding: 5px 4px;
     font-size: 8.5px;
     line-height: 1.05;
+    overflow: hidden;
     text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .mobile-nav-wallet {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    justify-self: stretch;
+    align-self: stretch;
+  }
+
+  .mobile-nav-wallet .wallet-connect,
+  .mobile-nav-wallet .win-button {
+    min-width: 0;
+    width: 100%;
+    justify-self: stretch;
+    align-self: stretch;
+    box-sizing: border-box;
+  }
+
+  .mobile-nav-wallet .wallet-connect {
+    display: grid;
+    height: 100%;
+    margin-top: 0 !important;
+  }
+
+  .mobile-nav-wallet .win-button {
+    min-width: 0;
+    width: 100%;
+    inline-size: 100%;
+    height: 100%;
+    min-height: 34px;
+    padding: 5px 4px;
+    font-size: 8.5px;
+    line-height: 1.05;
+    overflow: hidden;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .mobile-nav-wallet .wallet-disconnect-button {
+    display: grid;
+    place-items: center;
+    justify-self: stretch !important;
+    align-self: stretch !important;
+    width: 100% !important;
+    inline-size: 100% !important;
+    min-inline-size: 100% !important;
+    height: 100% !important;
+  }
+
+  .mobile-nav-wallet .wallet-disconnect-button:hover .wallet-address-label,
+  .mobile-nav-wallet .wallet-disconnect-button:focus-visible .wallet-address-label {
+    display: none;
+  }
+
+  .mobile-nav-wallet .wallet-disconnect-button:hover .wallet-disconnect-label,
+  .mobile-nav-wallet .wallet-disconnect-button:focus-visible .wallet-disconnect-label {
+    display: block;
+  }
+
+  .mobile-nav-wallet .wallet-menu {
+    position: absolute;
+    top: auto;
+    right: 0;
+    bottom: calc(100% + 7px);
+    left: auto;
+    width: min(280px, calc(100vw - 18px));
+    max-width: none;
+    margin-top: 0;
+    z-index: 120;
   }
 
   .protocol-hero {

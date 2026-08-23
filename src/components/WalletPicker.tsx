@@ -6,7 +6,12 @@ function shortAddress(address: string): string {
   return `${address.slice(0, 8)}...${address.slice(-6)}`
 }
 
-export function WalletPicker() {
+type WalletPickerProps = {
+  label?: string
+  menuId?: string
+}
+
+export function WalletPicker({ label = 'Connect account', menuId = 'wallet-provider-menu' }: WalletPickerProps) {
   const wallet = useWallet()
   const [open, setOpen] = useState(false)
 
@@ -20,10 +25,20 @@ export function WalletPicker() {
   }
 
   if (wallet.connected && wallet.address) {
+    const addressLabel = shortAddress(wallet.address)
+
     return (
-      <div className="wallet-chip">
-        <span>{shortAddress(wallet.address)}</span>
-        <button type="button" onClick={() => void wallet.disconnect()}>Disconnect</button>
+      <div className="wallet-connect">
+        <button
+          type="button"
+          className="win-button wallet-disconnect-button"
+          aria-label={`Disconnect wallet ${addressLabel}`}
+          title="Disconnect wallet"
+          onClick={() => void wallet.disconnect()}
+        >
+          <span className="wallet-address-label">{addressLabel}</span>
+          <span className="wallet-disconnect-label" aria-hidden="true">Disconnect</span>
+        </button>
       </div>
     )
   }
@@ -34,14 +49,14 @@ export function WalletPicker() {
         type="button"
         className="win-button"
         aria-expanded={open}
-        aria-controls="wallet-provider-menu"
+        aria-controls={menuId}
         disabled={wallet.connecting}
         onClick={() => setOpen((value) => !value)}
       >
-        {wallet.connecting ? 'Connecting...' : 'Connect account'}
+        {wallet.connecting ? 'Connecting...' : label}
       </button>
       {open && (
-        <div id="wallet-provider-menu" className="wallet-menu">
+        <div id={menuId} className="wallet-menu">
           {wallet.wallets.map((option) => (
             <button
               key={option.provider}

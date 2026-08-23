@@ -1686,6 +1686,9 @@ export default function App() {
           <button type="button" className={activeAppPage === 'docs' ? 'active' : ''} onClick={() => setActiveAppPage('docs')}>
             Documentation
           </button>
+          <div className="mobile-nav-wallet" aria-label="Wallet connection">
+            <WalletPicker label="Connect" menuId="mobile-wallet-provider-menu" />
+          </div>
         </aside>
 
         <div className="side-wallet" aria-label="Wallet connection">
