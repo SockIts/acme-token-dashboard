@@ -1,6 +1,6 @@
 @font-face {
   font-family: "Digital7 Mono";
-  src: url("/fonts/digital-7.monoitalic.ttf") format("truetype");
+  src: url("../public/fonts/digital-7.monoitalic.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -3558,7 +3558,7 @@ fieldset input,
   color: #f5fcff;
   background:
     linear-gradient(135deg, rgba(232, 250, 255, 0.12), rgba(9, 48, 90, 0.42)),
-    url("/card-backgrounds/sky-blue-card.jpg");
+    url("../public/card-backgrounds/sky-blue-card.jpg");
   background-position: center;
   background-size: cover;
   box-shadow: inset 2px 2px 0 #ffffff, inset -2px -2px 0 #0b315e, 4px 4px 0 rgba(24, 20, 17, 0.55), 0 0 20px rgba(107, 207, 255, 0.42);
@@ -3569,7 +3569,7 @@ fieldset input,
   background:
     linear-gradient(115deg, transparent 0 30%, rgba(255, 255, 255, 0.5) 35%, transparent 43%),
     linear-gradient(180deg, rgba(255, 246, 190, 0.04), rgba(64, 36, 4, 0.18)),
-    url("/card-backgrounds/gold-bar-card.jpg");
+    url("../public/card-backgrounds/gold-bar-card.jpg");
   background-position: center;
   background-size: cover;
   box-shadow: inset 3px 3px 0 #fff8c6, inset -3px -3px 0 #6b3a03, 4px 4px 0 rgba(24, 20, 17, 0.55), 0 0 24px rgba(255, 202, 85, 0.54);
@@ -3589,7 +3589,7 @@ fieldset input,
   background:
     linear-gradient(42deg, transparent 0 18%, rgba(255, 255, 255, 0.42) 18% 20%, transparent 20% 43%, rgba(255, 255, 255, 0.32) 43% 45%, transparent 45%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(94, 183, 220, 0.14)),
-    url("/card-backgrounds/diamond-card.jpg");
+    url("../public/card-backgrounds/diamond-card.jpg");
   background-position: center;
   background-size: cover;
   box-shadow: inset 3px 3px 0 #ffffff, inset -3px -3px 0 #3b8db2, 4px 4px 0 rgba(24, 20, 17, 0.55), 0 0 32px rgba(185, 242, 255, 0.72);
@@ -3617,7 +3617,7 @@ fieldset input,
   background:
     radial-gradient(circle at 72% 24%, rgba(255, 199, 95, 0.22), transparent 18%),
     linear-gradient(135deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.36)),
-    url("/card-backgrounds/black-card.jpg");
+    url("../public/card-backgrounds/black-card.jpg");
   background-position: center;
   background-size: cover;
   box-shadow: inset 2px 2px 0 #6d5a35, inset -2px -2px 0 #000000, 4px 4px 0 rgba(24, 20, 17, 0.76), 0 0 34px rgba(255, 190, 80, 0.46);
@@ -3730,10 +3730,10 @@ fieldset input,
 }
 
 .tier-thumb.tier-basic { background: linear-gradient(135deg, #294036, #0b1d15); }
-.tier-thumb.tier-sky { background: linear-gradient(135deg, rgba(232, 250, 255, 0.18), rgba(9, 48, 90, 0.45)), url("/card-backgrounds/sky-blue-card.jpg") center / cover; color: #071722; }
-.tier-thumb.tier-gold { background: linear-gradient(135deg, rgba(255, 246, 190, 0.16), rgba(64, 36, 4, 0.1)), url("/card-backgrounds/gold-bar-card.jpg") center / cover; color: #211306; }
-.tier-thumb.tier-diamond { background: linear-gradient(135deg, rgba(255, 255, 255, 0.38), rgba(94, 183, 220, 0.12)), url("/card-backgrounds/diamond-card.jpg") center / cover; color: #071722; }
-.tier-thumb.tier-black { background: linear-gradient(135deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.42)), url("/card-backgrounds/black-card.jpg") center / cover; color: #f7d77a; }
+.tier-thumb.tier-sky { background: linear-gradient(135deg, rgba(232, 250, 255, 0.18), rgba(9, 48, 90, 0.45)), url("../public/card-backgrounds/sky-blue-card.jpg") center / cover; color: #071722; }
+.tier-thumb.tier-gold { background: linear-gradient(135deg, rgba(255, 246, 190, 0.16), rgba(64, 36, 4, 0.1)), url("../public/card-backgrounds/gold-bar-card.jpg") center / cover; color: #211306; }
+.tier-thumb.tier-diamond { background: linear-gradient(135deg, rgba(255, 255, 255, 0.38), rgba(94, 183, 220, 0.12)), url("../public/card-backgrounds/diamond-card.jpg") center / cover; color: #071722; }
+.tier-thumb.tier-black { background: linear-gradient(135deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.42)), url("../public/card-backgrounds/black-card.jpg") center / cover; color: #f7d77a; }
 
 .nft-marketplace {
   display: grid;
