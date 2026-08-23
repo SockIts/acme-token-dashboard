@@ -5278,7 +5278,8 @@ fieldset input,
 
 @media (max-width: 640px) {
   .app-shell {
-    grid-template-columns: 82px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
     width: 100%;
     margin: 0;
     gap: 6px;
@@ -5288,28 +5289,36 @@ fieldset input,
   }
 
   .side-column {
+    order: 2;
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
     gap: 6px;
-    align-self: stretch;
+    align-self: end;
+    max-height: none;
     overflow: visible;
   }
 
   .side-nav {
-    grid-template-columns: 1fr;
+    grid-template-columns: 58px repeat(3, minmax(0, 1fr));
     gap: 4px;
     padding: 5px;
     box-shadow: inset 2px 2px 0 #f6efe3, inset -2px -2px 0 #786d60;
   }
 
   .app-shell .dashboard {
+    order: 1;
+    min-height: 0;
+    max-height: none;
     padding: 6px;
     box-shadow: inset 2px 2px 0 #f3f6ef, inset -2px -2px 0 #6b746b;
   }
 
   .side-wallet {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
     padding: 5px;
-    overflow: hidden;
+    overflow: visible;
     box-shadow: inset 2px 2px 0 #f6efe3, inset -2px -2px 0 #786d60;
   }
 
@@ -5326,19 +5335,23 @@ fieldset input,
   }
 
   .side-wallet .wallet-menu {
-    position: static;
+    position: absolute;
+    top: auto;
+    bottom: calc(100% + 5px);
+    left: 0;
+    right: 0;
     width: 100%;
     max-width: none;
-    margin-top: 5px;
+    margin-top: 0;
   }
 
   .side-brand {
-    min-height: 44px;
+    min-height: 34px;
     padding: 6px;
   }
 
   .side-brand span {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .side-brand strong {
