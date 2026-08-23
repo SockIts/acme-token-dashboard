@@ -105,6 +105,39 @@ const PROTOCOL_STATS = [
   { label: 'Fixed token supply', value: '1B ACME' },
 ] as const
 
+const DOCUMENTS = [
+  {
+    key: 'cortex',
+    title: 'ACME Cortex User Guide',
+    kind: 'Creator guide',
+    href: '/Documentation/ACME%20Cortex%20User%20Guide.html',
+    summary: 'Relationship graph workflows for tagging, provenance, references, and richer asset context.',
+  },
+  {
+    key: 'atomic',
+    title: 'ACME Atomic Swap Guide',
+    kind: 'Trading guide',
+    href: '/Documentation/ACME%20Atomic%20Swap%20Guide.html',
+    summary: 'Practical notes for atomic orders, fills, wallet flow, and deterministic market settlement.',
+  },
+  {
+    key: 'routing',
+    title: 'Trustless API Routing + Fees',
+    kind: 'Technical paper',
+    href: '/Documentation/ACMEProtocol_TrustlessAPIRoutingAndFeeDistributionArchitecture_TechnicalPaper.pdf',
+    summary: 'Architecture paper covering API routing, fee distribution, incentives, and verifiable service layers.',
+  },
+  {
+    key: 'runtime',
+    title: 'ACME Runtime',
+    kind: 'Runtime spec',
+    href: '/Documentation/ACME-RUNTIME.pdf',
+    summary: 'Reference material for ACME runtime behavior, programmable assets, and creator-facing execution.',
+  },
+] as const
+
+type DocumentKey = typeof DOCUMENTS[number]['key']
+
 const MAINNET_PREVIEW_ASSETS = [
   { asset: 'INVISIBLE', name: 'Invisible', artist: 'LUAMBRIZ', src: '/assets/mainnet-preview/invisible.jpg', detail: 'Browse asset pages, ownership, art metadata, and provenance from the live mainnet indexer.' },
   { asset: 'ECHOES', name: 'Echoes', artist: 'MEGANO', src: '/assets/mainnet-preview/echoes.jpg', detail: 'Mainnet assets render directly from ACME media endpoints with verifiable asset records.' },
@@ -721,15 +754,48 @@ function HomePage({ ctx, onOpenTokenDashboard, onOpenMintDashboard }: { ctx: Acm
 }
 
 function DocumentationPage() {
+  const [activeDocKey, setActiveDocKey] = useState<DocumentKey>('cortex')
+  const activeDoc = DOCUMENTS.find((doc) => doc.key === activeDocKey) ?? DOCUMENTS[0]
+
   return (
     <div className="documentation-page">
-      <WindowPanel title="DOCUMENTATION">
-        <div className="documentation-placeholder">
-          <span>Coming Soon</span>
-          <h2>ACME Protocol documentation is being assembled.</h2>
-          <p>This page will collect protocol references, wallet setup notes, minting flows, asset storage details, API examples, and creator guides inside this dashboard.</p>
+      <WindowPanel title="DOCUMENTATION -- ACME PROTOCOL LIBRARY">
+        <div className="documentation-hero">
+          <span>Reference Shelf</span>
+          <h2>Protocol docs for builders, artists, traders, and indexers.</h2>
+          <p>Read the current ACME references inside the dashboard: Cortex usage, atomic swaps, runtime behavior, and the routing architecture that connects fees back to protocol services.</p>
         </div>
       </WindowPanel>
+
+      <nav className="tabs documentation-tabs" aria-label="Documentation tabs">
+        {DOCUMENTS.map((doc) => (
+          <button
+            key={doc.key}
+            type="button"
+            className={activeDoc.key === doc.key ? 'active' : ''}
+            onClick={() => setActiveDocKey(doc.key)}
+          >
+            {doc.title}
+          </button>
+        ))}
+      </nav>
+
+      <WindowPanel title={`DOCUMENT -- ${activeDoc.title.toUpperCase()}`}>
+        <div className="documentation-reader">
+          <div className="documentation-reader-summary">
+            <span>{activeDoc.kind}</span>
+            <strong>{activeDoc.title}</strong>
+            <p>{activeDoc.summary}</p>
+          </div>
+          <iframe
+            key={activeDoc.href}
+            src={activeDoc.href}
+            title={activeDoc.title}
+            className="documentation-frame"
+          />
+        </div>
+      </WindowPanel>
+
     </div>
   )
 }
@@ -1632,7 +1698,7 @@ export default function App() {
         <header className="masthead">
           <div>
             <h1>{activeAppPage === 'home' ? 'ACME Protocol' : activeAppPage === 'docs' ? 'Documentation' : 'ACME Token Dashboard'}</h1>
-            <p>{activeAppPage === 'home' ? 'Assets Coded on the Monetary Engine · Bitcoin-native protocol overview' : activeAppPage === 'docs' ? 'Protocol references, creator guides, and API notes placeholder' : `Shareholder services terminal · live ACME mint and tokenomics pages · asset ${ASSET}`}</p>
+            <p>{activeAppPage === 'home' ? 'Assets Coded on the Monetary Engine · Bitcoin-native protocol overview' : activeAppPage === 'docs' ? 'Protocol references, creator guides, runtime docs, and market notes' : `Shareholder services terminal · live ACME mint and tokenomics pages · asset ${ASSET}`}</p>
           </div>
         </header>
 

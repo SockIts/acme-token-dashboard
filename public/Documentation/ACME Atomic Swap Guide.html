@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACME Atomic Swaps — User Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiempos+Text:ital,wght@0,400;0,500;1,400&family=Söhne:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-page:       #f9f8f5;
+    --bg-sidebar:    #f3f2ee;
+    --bg-surface:    #ffffff;
+    --bg-surface2:   #f9f8f5;
+    --bg-hover:      rgba(0,0,0,0.035);
+    --border:        rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.13);
+    --text-primary:  #1a1915;
+    --text-secondary:#6b6860;
+    --text-tertiary: #9c9a91;
+    --text-hint:     #bbb9b0;
+    --accent:        #da7756;
+    --accent-light:  rgba(218,119,86,0.12);
+    --accent-dim:    rgba(218,119,86,0.07);
+    --accent-text:   #b85c3a;
+    --green:         #3d7a5c;
+    --green-light:   rgba(61,122,92,0.1);
+    --yellow:        #8a6c2a;
+    --yellow-light:  rgba(138,108,42,0.1);
+    --blue:          #3b6ea8;
+    --blue-light:    rgba(59,110,168,0.1);
+    --gray:          #6b6860;
+    --gray-light:    rgba(107,104,96,0.1);
+    --font-body:     'Söhne', -apple-system, system-ui, sans-serif;
+    --font-serif:    'Tiempos Text', Georgia, 'Times New Roman', serif;
+    --font-mono:     'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace;
+    --sidebar-w:     256px;
+    --radius-sm:     6px;
+    --radius-md:     8px;
+    --radius-lg:     12px;
+  }
+
+  html.dark {
+    --bg-page:       #1a1915;
+    --bg-sidebar:    #151512;
+    --bg-surface:    #222118;
+    --bg-surface2:   #1a1915;
+    --bg-hover:      rgba(255,255,255,0.05);
+    --border:        rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.13);
+    --text-primary:  #e8e6df;
+    --text-secondary:#9c9a8e;
+    --text-tertiary: #6b6960;
+    --text-hint:     #48473f;
+    --accent:        #da7756;
+    --accent-light:  rgba(218,119,86,0.15);
+    --accent-dim:    rgba(218,119,86,0.09);
+    --accent-text:   #e8906f;
+    --green:         #5aa882;
+    --green-light:   rgba(90,168,130,0.12);
+    --yellow:        #c49a3a;
+    --yellow-light:  rgba(196,154,58,0.12);
+    --blue:          #6b9fd4;
+    --blue-light:    rgba(107,159,212,0.12);
+    --gray:          #9c9a8e;
+    --gray-light:    rgba(156,154,142,0.1);
+  }
+
+  html.dark pre { background: #111109; }
+
+  body, .sidebar, .hero, .callout, .concept-card,
+  .table-wrap, .flow, .limit-item, .next-btn, .step-num,
+  .flow-node, pre, .sidebar-header, thead tr,
+  #mob-bar, #mob-drawer, #mob-drawer-head {
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  }
+
+  #sidebar-theme-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 18px; border-top: 1px solid var(--border);
+    cursor: pointer; background: none;
+    border-left: none; border-right: none; border-bottom: none;
+    width: 100%; text-align: left; color: var(--text-tertiary);
+    font-family: var(--font-body); font-size: 13px;
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  }
+  #sidebar-theme-btn:hover { color: var(--text-secondary); background: var(--bg-hover); }
+  #sidebar-theme-label { flex: 1; }
+
+  .toggle-track {
+    width: 32px; height: 18px; border-radius: 20px;
+    background: var(--border-strong); position: relative; flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  html.dark .toggle-track { background: var(--accent); }
+  .toggle-thumb {
+    position: absolute; top: 3px; left: 3px;
+    width: 12px; height: 12px; border-radius: 50%; background: #fff;
+    transition: transform 0.18s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  html.dark .toggle-thumb { transform: translateX(14px); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg-page); color: var(--text-primary);
+    display: flex; min-height: 100vh;
+    font-size: 15px; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w); background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    position: fixed; top: 0; left: 0; height: 100vh;
+    overflow-y: auto; display: flex; flex-direction: column;
+    z-index: 100; scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .sidebar-header { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+  .logo-mark {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .logo-mark svg { width: 14px; height: 14px; fill: #fff; }
+  .logo-wordmark { font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--text-primary); letter-spacing: -0.01em; }
+  .sidebar-doc-label { font-size: 11px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; }
+  .sidebar-doc-title { font-family: var(--font-serif); font-size: 15px; font-weight: 400; color: var(--text-primary); line-height: 1.3; }
+  .sidebar-nav { padding: 8px 0 24px; flex: 1; }
+  .nav-group-label { padding: 12px 18px 4px; font-size: 10.5px; font-weight: 500; letter-spacing: 0.06em; color: var(--text-hint); text-transform: uppercase; }
+  .nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 18px; color: var(--text-secondary);
+    text-decoration: none; font-size: 13.5px; font-weight: 400;
+    border-left: 2px solid transparent;
+    transition: color 0.12s, background 0.12s; line-height: 1.4;
+  }
+  .nav-item:hover { color: var(--text-primary); background: var(--bg-hover); }
+  .nav-item.active { color: var(--accent-text); border-left-color: var(--accent); background: var(--accent-dim); font-weight: 500; }
+  .nav-item .num { font-size: 11px; color: var(--text-hint); width: 18px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .nav-item.active .num { color: rgba(218,119,86,0.5); }
+  .nav-item.sub { padding-left: 34px; font-size: 13px; }
+
+  /* MAIN */
+  .main { margin-left: var(--sidebar-w); flex: 1; min-width: 0; }
+
+  /* HERO */
+  .hero { background: var(--bg-surface); border-bottom: 1px solid var(--border); padding: 56px 64px 0; }
+  .hero-breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-tertiary); margin-bottom: 20px; }
+  .hero-breadcrumb span { color: var(--text-hint); }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--accent-light); color: var(--accent-text);
+    font-size: 11.5px; font-weight: 500; padding: 3px 10px;
+    border-radius: 20px; margin-bottom: 16px;
+    border: 1px solid rgba(218,119,86,0.2);
+  }
+  .hero h1 {
+    font-family: var(--font-serif); font-size: 42px; font-weight: 400;
+    color: var(--text-primary); line-height: 1.1; letter-spacing: -0.02em;
+    margin-bottom: 14px; max-width: 560px;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent-text); }
+  .hero-desc { font-size: 16px; color: var(--text-secondary); max-width: 520px; line-height: 1.75; margin-bottom: 36px; }
+  .hero-visual { margin: 0 -64px; border-top: 1px solid var(--border); }
+
+  /* SECTIONS */
+  .section { border-bottom: 1px solid var(--border); }
+  .section-inner { max-width: 740px; margin: 0 auto; padding: 56px 64px; }
+
+  /* TYPOGRAPHY */
+  .part-eyebrow {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 12px;
+  }
+  .part-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  h2 { font-family: var(--font-serif); font-size: 30px; font-weight: 400; color: var(--text-primary); margin-bottom: 10px; line-height: 1.2; letter-spacing: -0.015em; }
+  h3 { font-size: 16px; font-weight: 500; color: var(--text-primary); margin: 36px 0 12px; }
+  h4 { font-size: 11px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-tertiary); margin: 24px 0 8px; }
+  p { color: var(--text-secondary); margin-bottom: 14px; line-height: 1.75; }
+  p strong { color: var(--text-primary); font-weight: 500; }
+  .lead { font-size: 16px; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.8; padding-left: 16px; border-left: 2px solid var(--accent); }
+
+  /* CALLOUTS */
+  .callout { border-radius: var(--radius-md); padding: 14px 16px; margin: 16px 0; display: flex; gap: 12px; align-items: flex-start; border: 1px solid transparent; }
+  .callout-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; line-height: 1.2; }
+  .callout-body strong { color: var(--text-primary); display: block; margin-bottom: 2px; font-size: 13.5px; font-weight: 500; }
+  .callout-body p { margin: 0; font-size: 13.5px; line-height: 1.65; }
+  .callout.tip  { background: var(--green-light);  border-color: rgba(61,122,92,0.2); }
+  .callout.tip .callout-body strong { color: #2d5c43; }
+  .callout.info { background: var(--blue-light);   border-color: rgba(59,110,168,0.2); }
+  .callout.info .callout-body strong { color: #2c5280; }
+  .callout.warn { background: var(--yellow-light); border-color: rgba(138,108,42,0.2); }
+  .callout.warn .callout-body strong { color: #6b5120; }
+  .callout.danger { background: rgba(180,50,50,0.07); border-color: rgba(180,50,50,0.2); }
+  .callout.danger .callout-body strong { color: #8b2020; }
+
+  /* CONCEPT GRID */
+  .concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 24px 0; }
+  .concept-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; transition: border-color 0.15s, box-shadow 0.15s; }
+  .concept-card:hover { border-color: var(--border-strong); box-shadow: 0 1px 8px rgba(0,0,0,0.06); }
+  .concept-dir { font-size: 11px; font-weight: 500; color: var(--accent-text); margin-bottom: 6px; letter-spacing: 0.03em; }
+  .concept-name { font-family: var(--font-serif); font-size: 17px; font-weight: 400; color: var(--text-primary); margin-bottom: 6px; }
+  .concept-desc { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+
+  /* STEPS */
+  .steps { margin: 20px 0; }
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-surface); border: 1px solid var(--border-strong); color: var(--text-secondary); font-size: 11.5px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .step-body strong { color: var(--text-primary); display: block; margin-bottom: 1px; font-size: 14px; font-weight: 500; }
+  .step-body p { margin: 0; font-size: 13.5px; color: var(--text-secondary); }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; margin: 18px 0; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-surface); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead tr { background: var(--bg-surface2); }
+  th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; color: var(--text-tertiary); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  td { padding: 11px 14px; color: var(--text-secondary); border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.6; }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--bg-hover); }
+  td strong { color: var(--text-primary); font-weight: 500; }
+  td code, p code { font-family: var(--font-mono); font-size: 12px; background: var(--bg-surface2); padding: 1.5px 6px; border-radius: 4px; color: var(--accent-text); border: 1px solid var(--border); }
+
+  /* BADGES */
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 500; vertical-align: middle; }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .badge.green  { background: var(--green-light);  color: var(--green);  border: 1px solid rgba(61,122,92,0.2); }
+  .badge.green .badge-dot  { background: var(--green); }
+  .badge.yellow { background: var(--yellow-light); color: var(--yellow); border: 1px solid rgba(138,108,42,0.2); }
+  .badge.yellow .badge-dot { background: var(--yellow); }
+  .badge.blue   { background: var(--blue-light);   color: var(--blue);   border: 1px solid rgba(59,110,168,0.2); }
+  .badge.blue .badge-dot   { background: var(--blue); }
+  .badge.gray   { background: var(--gray-light);   color: var(--gray);   border: 1px solid rgba(107,104,96,0.2); }
+  .badge.gray .badge-dot   { background: var(--gray); }
+  .badge.red    { background: rgba(180,50,50,0.1); color: #8b2020; border: 1px solid rgba(180,50,50,0.2); }
+  .badge.red .badge-dot    { background: #8b2020; }
+
+  /* CODE */
+  pre {
+    background: #f3f2ee; border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 16px 18px;
+    overflow-x: auto; margin: 16px 0;
+    font-family: var(--font-mono); font-size: 12.5px;
+    line-height: 1.7; color: var(--text-secondary);
+  }
+  pre .c { color: var(--text-hint); }
+  pre .g { color: var(--green); }
+  pre .y { color: var(--yellow); }
+  pre .b { color: var(--blue); }
+  pre .r { color: #8b2020; }
+  pre .a { color: var(--accent-text); }
+
+  /* FLOW */
+  .flow { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 20px; margin: 18px 0; font-family: var(--font-mono); font-size: 12.5px; line-height: 2; overflow-x: auto; }
+  .flow-node { display: inline-block; background: var(--bg-surface2); border: 1px solid var(--border-strong); border-radius: 5px; padding: 2px 9px; color: var(--text-primary); font-size: 12px; white-space: nowrap; }
+  .flow-rel { color: var(--accent-text); font-size: 11px; }
+  .flow-arrow { color: var(--text-hint); }
+  .flow-comment { color: var(--text-hint); font-size: 11px; }
+
+  /* PHASE CARD */
+  .phase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 22px 0; }
+  .phase-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 16px; }
+  .phase-num { font-family: var(--font-serif); font-size: 24px; color: var(--accent-text); line-height: 1; margin-bottom: 8px; }
+  .phase-title { font-size: 13.5px; font-weight: 500; color: var(--text-primary); margin-bottom: 6px; }
+  .phase-desc { font-size: 12.5px; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+
+  /* SECTION FOOTER */
+  .section-footer { display: flex; justify-content: flex-end; margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--border); }
+  .next-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-secondary); text-decoration: none; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 14px; background: var(--bg-surface); transition: border-color 0.12s, color 0.12s, box-shadow 0.12s; }
+  .next-btn:hover { border-color: var(--accent); color: var(--accent-text); box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .next-btn .arr { color: var(--accent); }
+
+  /* MOBILE */
+  #mob-bar { display: none; position: fixed; top: 0; left: 0; right: 0; height: 52px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); z-index: 400; align-items: center; padding: 0 14px; gap: 8px; box-sizing: border-box; }
+  #mob-bar-title { flex: 1; font-size: 14px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #mob-theme-btn, #mob-menu-btn { width: 38px; height: 38px; border: 1px solid var(--border-strong); border-radius: var(--radius-md); background: var(--bg-surface); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--text-secondary); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  #mob-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 500; }
+  #mob-drawer { display: none; position: fixed; top: 0; left: 0; width: 280px; max-width: 85vw; height: 100%; background: var(--bg-sidebar); border-right: 1px solid var(--border); z-index: 600; overflow-y: auto; flex-direction: column; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  #mob-drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-sidebar); z-index: 1; }
+  #mob-drawer-head-logo { display: flex; align-items: center; gap: 8px; }
+  #mob-close-btn { width: 30px; height: 30px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: var(--text-tertiary); -webkit-tap-highlight-color: transparent; touch-action: manipulation; flex-shrink: 0; }
+  #mob-drawer-nav { flex: 1; padding: 6px 0 16px; overflow-y: auto; }
+  #mob-drawer-nav .nav-group-label { padding: 14px 16px 4px; font-size: 10px; letter-spacing: 0.06em; color: var(--text-hint); text-transform: uppercase; font-weight: 500; }
+  #mob-drawer-nav .nav-item { padding: 10px 16px; min-height: 44px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  #mob-drawer-nav .nav-item.sub { padding-left: 32px; font-size: 13px; min-height: 38px; }
+  #mob-drawer-footer { border-top: 1px solid var(--border); padding: 12px 16px; }
+  #mob-drawer-theme-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 0; background: none; border: none; cursor: pointer; color: var(--text-secondary); font-family: var(--font-body); font-size: 14px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; text-align: left; }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding-top: 52px; }
+    .hero { padding: 28px 20px 0; }
+    .hero-breadcrumb { display: none; }
+    .hero-visual { margin: 0 -20px; }
+    .hero h1 { font-size: 30px; }
+    .hero-desc { font-size: 15px; margin-bottom: 28px; }
+    .section-inner { padding: 32px 20px; }
+    h2 { font-size: 24px; }
+    h3 { font-size: 15px; margin: 28px 0 10px; }
+    .concept-grid { grid-template-columns: 1fr; }
+    .phase-grid { grid-template-columns: 1fr 1fr; }
+    .table-wrap { border-radius: var(--radius-sm); }
+    table { font-size: 13px; }
+    th, td { padding: 9px 12px; }
+    pre { font-size: 11.5px; padding: 13px 14px; }
+    .section-footer { margin-top: 28px; padding-top: 18px; }
+  }
+  @media (max-width: 400px) {
+    .hero h1 { font-size: 26px; }
+    .section-inner { padding: 28px 16px; }
+    .phase-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MOBILE BAR -->
+<header id="mob-bar">
+  <div id="mob-bar-title">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:24px;height:24px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 1.5C3.96 1.5 1.5 3.96 1.5 7s2.46 5.5 5.5 5.5 5.5-2.46 5.5-5.5S10.04 1.5 7 1.5zM7 11a4 4 0 110-8 4 4 0 010 8z" fill="white"/><circle cx="7" cy="7" r="1.8" fill="white"/></svg>
+      </div>
+      <span style="font-size:14px;font-weight:500;color:var(--text-primary);">ACME Atomic Swaps</span>
+    </div>
+  </div>
+  <button id="mob-theme-btn" aria-label="Toggle dark mode">
+    <svg id="mob-sun" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="3.5" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="1" x2="9" y2="3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="9" y1="14.5" x2="9" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1" y1="9" x2="3.5" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="14.5" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="3.2" y1="3.2" x2="5" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="13" y1="13" x2="14.8" y2="14.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="3.2" y1="14.8" x2="5" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="13" y1="5" x2="14.8" y2="3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <svg id="mob-moon" width="18" height="18" viewBox="0 0 18 18" fill="none" style="display:none"><path d="M15 11.5A7 7 0 016.5 3a7 7 0 000 12 7 7 0 008.5-3.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button id="mob-menu-btn" aria-label="Open navigation">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><line x1="2" y1="5" x2="16" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="2" y1="9" x2="16" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="2" y1="13" x2="16" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+</header>
+
+<div id="mob-overlay"></div>
+
+<nav id="mob-drawer" role="dialog" aria-label="Navigation" aria-modal="true">
+  <div id="mob-drawer-head">
+    <div id="mob-drawer-head-logo">
+      <div style="width:24px;height:24px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 1.5C3.96 1.5 1.5 3.96 1.5 7s2.46 5.5 5.5 5.5 5.5-2.46 5.5-5.5S10.04 1.5 7 1.5zM7 11a4 4 0 110-8 4 4 0 010 8z" fill="white"/><circle cx="7" cy="7" r="1.8" fill="white"/></svg>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">ACME Atomic Swaps</div>
+        <div style="font-size:11px;color:var(--text-tertiary);">User Guide</div>
+      </div>
+    </div>
+    <button id="mob-close-btn" aria-label="Close"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="2" x2="14" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="14" y1="2" x2="2" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  </div>
+  <div id="mob-drawer-nav">
+    <div class="nav-group-label">Overview</div>
+    <a class="nav-item" href="#intro"><span class="num">—</span>What are Atomic Swaps?</a>
+    <a class="nav-item" href="#how-it-works"><span class="num">—</span>How it Works</a>
+    <div class="nav-group-label">For Sellers</div>
+    <a class="nav-item" href="#selling"><span class="num">01</span>Creating a Listing</a>
+    <a class="nav-item" href="#managing"><span class="num">02</span>Managing Orders</a>
+    <div class="nav-group-label">For Buyers</div>
+    <a class="nav-item" href="#buying"><span class="num">03</span>Filling an Order</a>
+    <a class="nav-item" href="#marketplace"><span class="num">04</span>Browsing the Marketplace</a>
+    <div class="nav-group-label">Under the Hood</div>
+    <a class="nav-item" href="#security"><span class="num">05</span>Security Model</a>
+    <a class="nav-item" href="#lifecycle"><span class="num">06</span>Order Lifecycle</a>
+    <a class="nav-item" href="#transactions"><span class="num">07</span>Transaction Structure</a>
+    <a class="nav-item" href="#api"><span class="num">08</span>API Reference</a>
+    <div class="nav-group-label">Reference</div>
+    <a class="nav-item" href="#comparison"><span class="num">—</span>vs. Other Methods</a>
+    <a class="nav-item" href="#glossary"><span class="num">—</span>Glossary</a>
+  </div>
+  <div id="mob-drawer-footer">
+    <button id="mob-drawer-theme-btn">
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      <span id="mob-drawer-theme-label">Light mode</span>
+    </button>
+  </div>
+</nav>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><path d="M7 1.5C3.96 1.5 1.5 3.96 1.5 7s2.46 5.5 5.5 5.5 5.5-2.46 5.5-5.5S10.04 1.5 7 1.5zM7 11a4 4 0 110-8 4 4 0 010 8z" fill="white" opacity="0.9"/><circle cx="7" cy="7" r="1.8" fill="white"/></svg>
+      </div>
+      <span class="logo-wordmark">ACME</span>
+    </div>
+    <div class="sidebar-doc-label">User Guide</div>
+    <div class="sidebar-doc-title">Atomic Swaps</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a class="nav-item active" href="#intro"><span class="num">—</span>What are Atomic Swaps?</a>
+    <a class="nav-item" href="#how-it-works"><span class="num">—</span>How it Works</a>
+    <div class="nav-group-label">For Sellers</div>
+    <a class="nav-item" href="#selling"><span class="num">01</span>Creating a Listing</a>
+    <a class="nav-item" href="#managing"><span class="num">02</span>Managing Orders</a>
+    <div class="nav-group-label">For Buyers</div>
+    <a class="nav-item" href="#buying"><span class="num">03</span>Filling an Order</a>
+    <a class="nav-item" href="#marketplace"><span class="num">04</span>Browsing the Marketplace</a>
+    <div class="nav-group-label">Under the Hood</div>
+    <a class="nav-item" href="#security"><span class="num">05</span>Security Model</a>
+    <a class="nav-item" href="#lifecycle"><span class="num">06</span>Order Lifecycle</a>
+    <a class="nav-item" href="#transactions"><span class="num">07</span>Transaction Structure</a>
+    <a class="nav-item" href="#api"><span class="num">08</span>API Reference</a>
+    <div class="nav-group-label">Reference</div>
+    <a class="nav-item" href="#comparison"><span class="num">—</span>vs. Other Methods</a>
+    <a class="nav-item" href="#glossary"><span class="num">—</span>Glossary</a>
+  </div>
+  <button id="sidebar-theme-btn" aria-label="Toggle dark mode">
+    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+    <span id="sidebar-theme-label">Light mode</span>
+  </button>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- HERO -->
+<section id="intro">
+  <div class="hero">
+    <div class="hero-breadcrumb">ACME <span>/</span> Documentation <span>/</span> Atomic Swaps</div>
+    <div class="hero-badge">User Guide</div>
+    <h1>ACME <em>Atomic Swaps</em></h1>
+    <p class="hero-desc">Trade ACME assets for Bitcoin in a single, trustless transaction. No counterparty risk, no escrow service, no waiting — just a cryptographically secure swap that either completes fully or not at all.</p>
+  </div>
+  <div class="hero-visual">
+    <svg width="100%" viewBox="0 0 680 200" style="display:block;">
+      <defs><marker id="arwH" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <g style="fill:#f3f2ee;stroke:rgba(0,0,0,0.1);stroke-width:0.5;"><rect x="80" y="60" width="150" height="80" rx="12"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:12px;fill:#6b6860;" x="155" y="96" text-anchor="middle">Seller</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#1a1915;" x="155" y="116" text-anchor="middle">ZENBTC ×1</text>
+      <g style="fill:#f3f2ee;stroke:rgba(0,0,0,0.1);stroke-width:0.5;"><rect x="450" y="60" width="150" height="80" rx="12"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:12px;fill:#6b6860;" x="525" y="96" text-anchor="middle">Buyer</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#1a1915;" x="525" y="116" text-anchor="middle">1.0 BTC</text>
+      <line x1="230" y1="92" x2="448" y2="92" stroke="#3d7a5c" stroke-width="2" marker-end="url(#arwH)"/>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#3d7a5c;" x="340" y="84" text-anchor="middle">ZENBTC →</text>
+      <line x1="450" y1="112" x2="232" y2="112" stroke="#3b6ea8" stroke-width="2" marker-end="url(#arwH)"/>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#3b6ea8;" x="340" y="128" text-anchor="middle">← BTC</text>
+      <g style="fill:rgba(218,119,86,0.1);stroke:rgba(218,119,86,0.3);stroke-width:0.5;stroke-dasharray:4 3;"><rect x="290" y="48" width="100" height="104" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#b85c3a;" x="340" y="44" text-anchor="middle">one transaction</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11.5px;fill:#6b6860;" x="340" y="175" text-anchor="middle">Both assets move atomically — the swap either completes fully or not at all</text>
+    </svg>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how-it-works">
+  <div class="section-inner">
+    <div class="part-eyebrow">Concepts</div>
+    <h2>How it Works</h2>
+    <p class="lead">Atomic Swaps replace the old multi-step BTCPay settlement with a <strong>single Bitcoin transaction</strong>. The seller locks the asset on-chain; any buyer can complete the trade without the seller being online.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-dir">step 1 — seller</div>
+        <div class="concept-name">AtomicSell</div>
+        <p class="concept-desc">Seller broadcasts a listing transaction that escrows the asset and creates a tiny 546-sat <em>fill UTXO</em> as an anchor.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-dir">step 2 — buyer</div>
+        <div class="concept-name">AtomicFill</div>
+        <p class="concept-desc">Buyer adds BTC to the seller's pre-signed PSBT and broadcasts — one transaction settles the trade instantly.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-dir">anchor</div>
+        <div class="concept-name">Fill UTXO</div>
+        <p class="concept-desc">A 546-sat dust output that binds the asset. Spending it by an AtomicFill credits the buyer; spending it any other way cancels the order.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-dir">protection</div>
+        <div class="concept-name">Seller Auth</div>
+        <p class="concept-desc">A 64-byte Schnorr signature by the seller over the exact trade terms — preventing buyers from altering price, asset, or quantity.</p>
+      </div>
+    </div>
+
+    <svg width="100%" viewBox="0 0 680 240" style="display:block;margin:24px 0;">
+      <defs><marker id="arwC" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <g style="fill:#E1F5EE;stroke:#0F6E56;stroke-width:0.5;"><rect x="30" y="30" width="140" height="56" rx="8"/></g>
+      <text class="t" style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#085041;" x="100" y="54" text-anchor="middle" dominant-baseline="central">Seller broadcasts</text>
+      <text class="ts" style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#0F6E56;" x="100" y="72" text-anchor="middle" dominant-baseline="central">AtomicSell TX</text>
+      <line x1="170" y1="58" x2="208" y2="58" stroke="#888780" stroke-width="1.2" marker-end="url(#arwC)"/>
+      <g style="fill:#EEEDFE;stroke:#534AB7;stroke-width:0.5;"><rect x="210" y="30" width="140" height="56" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#26215C;" x="280" y="54" text-anchor="middle" dominant-baseline="central">Asset escrowed</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#534AB7;" x="280" y="72" text-anchor="middle" dominant-baseline="central">Fill UTXO created</text>
+      <line x1="350" y1="58" x2="388" y2="58" stroke="#888780" stroke-width="1.2" marker-end="url(#arwC)"/>
+      <g style="fill:#FAEEDA;stroke:#854F0B;stroke-width:0.5;"><rect x="390" y="30" width="155" height="56" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#412402;" x="467" y="54" text-anchor="middle" dominant-baseline="central">PSBT + seller_auth</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#854F0B;" x="467" y="72" text-anchor="middle" dominant-baseline="central">posted to marketplace</text>
+      <line x1="467" y1="86" x2="467" y2="118" stroke="#888780" stroke-width="1.2" marker-end="url(#arwC)"/>
+      <g style="fill:#E6F1FB;stroke:#185FA5;stroke-width:0.5;"><rect x="390" y="120" width="155" height="56" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#042C53;" x="467" y="144" text-anchor="middle" dominant-baseline="central">Buyer fills PSBT</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#185FA5;" x="467" y="162" text-anchor="middle" dominant-baseline="central">adds BTC UTXOs</text>
+      <line x1="390" y1="148" x2="352" y2="148" stroke="#888780" stroke-width="1.2" marker-end="url(#arwC)"/>
+      <g style="fill:#EAF3DE;stroke:#3B6D11;stroke-width:0.5;"><rect x="210" y="120" width="140" height="56" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#173404;" x="280" y="144" text-anchor="middle" dominant-baseline="central">One TX broadcast</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#3B6D11;" x="280" y="162" text-anchor="middle" dominant-baseline="central">AtomicFill settles</text>
+      <line x1="210" y1="148" x2="172" y2="148" stroke="#888780" stroke-width="1.2" marker-end="url(#arwC)"/>
+      <g style="fill:#EAF3DE;stroke:#3B6D11;stroke-width:1;"><rect x="30" y="120" width="140" height="56" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#173404;" x="100" y="144" text-anchor="middle" dominant-baseline="central">Trade complete</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#3B6D11;" x="100" y="162" text-anchor="middle" dominant-baseline="central">Asset to buyer · BTC to seller</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11.5px;fill:#6b6860;" x="340" y="220" text-anchor="middle">Total: 2 transactions · no seller interaction needed at fill time</text>
+    </svg>
+
+    <div class="callout tip">
+      <div class="callout-icon">⚡</div>
+      <div class="callout-body">
+        <strong>Why this is better</strong>
+        <p>Old BTCPay orders required 3 transactions and seller interaction at fill time. Atomic Swaps need just 2 transactions and the seller can be completely offline when the buyer fills.</p>
+      </div>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#selling">Part 01: Creating a Listing <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- SELLING -->
+<section class="section" id="selling">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 01 — Sellers</div>
+    <h2>Creating a Listing</h2>
+    <p class="lead">Listing an asset for sale takes two steps: broadcast an <strong>AtomicSell</strong> transaction to escrow the asset on-chain, then post your PSBT and signature to the marketplace so buyers can find and fill your order.</p>
+
+    <svg width="100%" viewBox="0 0 680 130" style="display:block;margin:20px 0;">
+      <defs><marker id="arwS" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <g style="fill:#E1F5EE;stroke:#0F6E56;stroke-width:0.5;"><rect x="30" y="35" width="130" height="55" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:12px;font-weight:500;fill:#085041;" x="95" y="58" text-anchor="middle" dominant-baseline="central">Set price</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#0F6E56;" x="95" y="75" text-anchor="middle" dominant-baseline="central">&amp; quantity</text>
+      <line x1="160" y1="62" x2="188" y2="62" stroke="#888780" stroke-width="1" marker-end="url(#arwS)"/>
+      <g style="fill:#EEEDFE;stroke:#534AB7;stroke-width:0.5;"><rect x="190" y="35" width="130" height="55" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:12px;font-weight:500;fill:#26215C;" x="255" y="58" text-anchor="middle" dominant-baseline="central">Sign &amp; broadcast</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#534AB7;" x="255" y="75" text-anchor="middle" dominant-baseline="central">AtomicSell TX</text>
+      <line x1="320" y1="62" x2="348" y2="62" stroke="#888780" stroke-width="1" marker-end="url(#arwS)"/>
+      <g style="fill:#FAEEDA;stroke:#854F0B;stroke-width:0.5;"><rect x="350" y="35" width="135" height="55" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:12px;font-weight:500;fill:#412402;" x="417" y="58" text-anchor="middle" dominant-baseline="central">Sign seller_auth</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#854F0B;" x="417" y="75" text-anchor="middle" dominant-baseline="central">&amp; fill PSBT</text>
+      <line x1="485" y1="62" x2="513" y2="62" stroke="#888780" stroke-width="1" marker-end="url(#arwS)"/>
+      <g style="fill:#EAF3DE;stroke:#3B6D11;stroke-width:0.5;"><rect x="515" y="35" width="135" height="55" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:12px;font-weight:500;fill:#173404;" x="582" y="58" text-anchor="middle" dominant-baseline="central">Post to</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#3B6D11;" x="582" y="75" text-anchor="middle" dominant-baseline="central">marketplace</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#6b6860;" x="340" y="115" text-anchor="middle">Your listing is live — buyers can now fill it with no further action from you</text>
+    </svg>
+
+    <h3>Step-by-Step</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Choose your asset, quantity, and price</strong><p>Navigate to <strong>Marketplace → Create Listing</strong>. Select the asset you want to sell, enter the quantity, and set your price in satoshis. Minimum price is 1,000 satoshis.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Set an expiration</strong><p>Choose how long the listing stays open — from 1 block (~10 min) to 8,064 blocks (~8 weeks). If unfilled by expiry, the escrowed asset automatically returns to your wallet.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Sign the order transaction</strong><p>Your wallet builds and signs the <code>AtomicSell</code> TX. This debits the asset from your balance and creates the on-chain fill UTXO. Broadcast it.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Sign the fill PSBT and seller_auth</strong><p>After the order TX confirms, sign two more things: the <strong>fill template PSBT</strong> (with <code>SIGHASH_SINGLE|ANYONECANPAY</code>) and the <strong>seller_auth</strong> Schnorr signature over your trade terms. These prove you set the price and allow buyers to complete the trade.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Submit to the marketplace</strong><p>Post your partial PSBT and seller_auth to the marketplace relay. Your listing is now live — buyers can fill it any time, with no further action needed from you.</p></div></div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <strong>Asset is escrowed immediately</strong>
+        <p>The moment your <code>AtomicSell</code> TX confirms, the asset is debited from your balance and held in escrow. You cannot send it elsewhere while the order is open — cancel the order first to get it back.</p>
+      </div>
+    </div>
+
+    <h3>Listing Parameters</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Parameter</th><th>Description</th><th>Constraints</th></tr></thead>
+        <tbody>
+          <tr><td><code>give_asset</code></td><td>The asset you are selling</td><td>Must exist · cannot be BTC</td></tr>
+          <tr><td><code>give_quantity</code></td><td>Quantity to sell</td><td>Must be positive · you must hold this balance</td></tr>
+          <tr><td><code>btc_price</code></td><td>Total price in satoshis</td><td>Minimum 1,000 sats</td></tr>
+          <tr><td><code>expiration</code></td><td>Blocks until the order expires</td><td>1–8,064 blocks (~1 min to ~8 weeks)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#managing">Part 02: Managing Orders <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- MANAGING -->
+<section class="section" id="managing">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 02 — Sellers</div>
+    <h2>Managing Orders</h2>
+    <p class="lead">Once a listing is live, you can track its status, cancel it at any time, or let it expire. Your asset is always safe — it returns to you if not filled.</p>
+
+    <h3>Order Statuses</h3>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-dir"><span class="badge green"><span class="badge-dot"></span>open</span></div>
+        <div class="concept-name">Active listing</div>
+        <p class="concept-desc">Asset is escrowed and the listing is visible to buyers on the marketplace. Anyone can fill it.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-dir"><span class="badge blue"><span class="badge-dot"></span>filled</span></div>
+        <div class="concept-name">Trade complete</div>
+        <p class="concept-desc">A buyer filled the order. BTC is in your wallet, asset has been transferred to the buyer.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-dir"><span class="badge gray"><span class="badge-dot"></span>cancelled</span></div>
+        <div class="concept-name">Cancelled by seller</div>
+        <p class="concept-desc">You spent the fill UTXO in a non-fill transaction. The escrowed asset has been refunded to you.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-dir"><span class="badge yellow"><span class="badge-dot"></span>expired</span></div>
+        <div class="concept-name">Expired unfilled</div>
+        <p class="concept-desc">The order passed its expiry block. The escrowed asset has been automatically refunded to you.</p>
+      </div>
+    </div>
+
+    <h3>How to Cancel an Order</h3>
+    <p>To cancel, go to <strong>Marketplace → My Orders</strong> and click <strong>Cancel</strong> on an open listing. This broadcasts a transaction that spends the fill UTXO without being an AtomicFill — which the indexer detects as an implicit cancel and refunds your asset.</p>
+
+    <div class="callout info">
+      <div class="callout-icon">ℹ️</div>
+      <div class="callout-body">
+        <strong>Race condition on cancel</strong>
+        <p>If a buyer's fill TX and your cancel TX are both in the mempool at the same time, whichever confirms first wins. If the buyer wins, the trade completes and you receive BTC. If your cancel wins, the asset is refunded and the buyer's TX fails (no BTC sent).</p>
+      </div>
+    </div>
+
+    <h3>Expiry</h3>
+    <p>Orders expire automatically when the Bitcoin block height reaches <code>creation_block + expiration</code>. The protocol refunds your asset in the same block — no action needed on your part.</p>
+
+    <svg width="100%" viewBox="0 0 680 150" style="display:block;margin:20px 0;">
+      <defs><marker id="arwM" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <g style="fill:#E1F5EE;stroke:#0F6E56;stroke-width:0.5;"><rect x="260" y="20" width="160" height="45" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#085041;" x="340" y="43" text-anchor="middle" dominant-baseline="central">open</text>
+      <line x1="310" y1="65" x2="200" y2="95" stroke="#888780" stroke-width="1" marker-end="url(#arwM)"/>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10.5px;fill:#6b6860;" x="236" y="80" text-anchor="middle">buyer fills</text>
+      <line x1="340" y1="65" x2="340" y2="95" stroke="#888780" stroke-width="1" marker-end="url(#arwM)"/>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10.5px;fill:#6b6860;" x="360" y="82" text-anchor="start">cancel</text>
+      <line x1="370" y1="65" x2="475" y2="95" stroke="#888780" stroke-width="1" marker-end="url(#arwM)"/>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10.5px;fill:#6b6860;" x="436" y="79" text-anchor="middle">expires</text>
+      <g style="fill:#E6F1FB;stroke:#185FA5;stroke-width:0.5;"><rect x="120" y="97" width="110" height="40" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:12px;font-weight:500;fill:#042C53;" x="175" y="117" text-anchor="middle" dominant-baseline="central">filled</text>
+      <g style="fill:#F1EFE8;stroke:#5F5E5A;stroke-width:0.5;"><rect x="285" y="97" width="110" height="40" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:12px;font-weight:500;fill:#2C2C2A;" x="340" y="117" text-anchor="middle" dominant-baseline="central">cancelled</text>
+      <g style="fill:#FAEEDA;stroke:#854F0B;stroke-width:0.5;"><rect x="450" y="97" width="110" height="40" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:12px;font-weight:500;fill:#412402;" x="505" y="117" text-anchor="middle" dominant-baseline="central">expired</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#3d7a5c;" x="175" y="145" text-anchor="middle">BTC credited to seller</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#6b6860;" x="340" y="145" text-anchor="middle">asset refunded</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#6b6860;" x="505" y="145" text-anchor="middle">asset refunded</text>
+    </svg>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#buying">Part 03: Filling an Order <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- BUYING -->
+<section class="section" id="buying">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 03 — Buyers</div>
+    <h2>Filling an Order</h2>
+    <p class="lead">Buying is a single action. Find a listing, review the terms, and sign the fill transaction — the asset arrives in your wallet the moment it confirms, with your BTC going to the seller atomically.</p>
+
+    <h3>How to Fill an Order</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Browse the marketplace</strong><p>Go to <strong>Marketplace → Browse</strong> and filter by asset, price, or availability. Each listing shows the asset, quantity, total BTC price, and blocks remaining.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Select a listing and click Buy</strong><p>The app fetches the seller's partial PSBT and <code>seller_auth</code> from the relay, and calls <code>POST /v2/compose/atomicfill</code> to build the complete transaction.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Review the transaction</strong><p>Confirm the asset, quantity, and BTC price. The composed PSBT shows exactly what you'll send (BTC) and receive (the asset).</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Sign and broadcast</strong><p>Sign the fill transaction with your wallet (<code>SIGHASH_ALL</code> on your inputs). Broadcast to Bitcoin. Once confirmed, the asset is credited to your address.</p></div></div>
+    </div>
+
+    <svg width="100%" viewBox="0 0 680 160" style="display:block;margin:20px 0;">
+      <defs><marker id="arwB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11.5px;font-weight:500;fill:#1a1915;" x="40" y="30">Fill TX inputs</text>
+      <g style="fill:#EEEDFE;stroke:#534AB7;stroke-width:0.5;"><rect x="40" y="42" width="150" height="40" rx="6"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#26215C;" x="115" y="62" text-anchor="middle" dominant-baseline="central">input[0] — fill UTXO</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10px;fill:#534AB7;" x="115" y="76" text-anchor="middle" dominant-baseline="central">seller pre-signed</text>
+      <g style="fill:#E6F1FB;stroke:#185FA5;stroke-width:0.5;"><rect x="40" y="92" width="150" height="40" rx="6"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#042C53;" x="115" y="112" text-anchor="middle" dominant-baseline="central">input[1..N] — buyer BTC</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10px;fill:#185FA5;" x="115" y="126" text-anchor="middle" dominant-baseline="central">buyer signs</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11.5px;font-weight:500;fill:#1a1915;" x="380" y="30">Fill TX outputs</text>
+      <g style="fill:#EAF3DE;stroke:#3B6D11;stroke-width:0.5;"><rect x="380" y="42" width="150" height="40" rx="6"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#173404;" x="455" y="62" text-anchor="middle" dominant-baseline="central">output[0] — BTC to seller</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10px;fill:#3B6D11;" x="455" y="76" text-anchor="middle" dominant-baseline="central">locked by seller's sig</text>
+      <g style="fill:#E1F5EE;stroke:#0F6E56;stroke-width:0.5;"><rect x="380" y="92" width="150" height="40" rx="6"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#085041;" x="455" y="109" text-anchor="middle" dominant-baseline="central">output[1] — dust to buyer</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10px;fill:#0F6E56;" x="455" y="123" text-anchor="middle" dominant-baseline="central">546 sats · destination</text>
+      <g style="fill:#FAEEDA;stroke:#854F0B;stroke-width:0.5;"><rect x="545" y="42" width="105" height="40" rx="6"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#412402;" x="597" y="60" text-anchor="middle" dominant-baseline="central">output[2]</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10px;fill:#854F0B;" x="597" y="76" text-anchor="middle" dominant-baseline="central">ACME envelope</text>
+      <g style="fill:#F1EFE8;stroke:#5F5E5A;stroke-width:0.5;"><rect x="545" y="92" width="105" height="40" rx="6"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#2C2C2A;" x="597" y="109" text-anchor="middle" dominant-baseline="central">output[3]</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10px;fill:#5F5E5A;" x="597" y="123" text-anchor="middle" dominant-baseline="central">buyer's change</text>
+      <rect x="245" y="35" width="130" height="105" rx="8" fill="rgba(218,119,86,0.06)" stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="4 3"/>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#b85c3a;" x="310" y="90" text-anchor="middle" dominant-baseline="central">one TX</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#6b6860;" x="340" y="148" text-anchor="middle">Asset is credited to the buyer's address identified by output[1] (destination_idx=1)</text>
+    </svg>
+
+    <div class="callout tip">
+      <div class="callout-icon">✅</div>
+      <div class="callout-body">
+        <strong>Zero counterparty risk</strong>
+        <p>You cannot be cheated. The seller's signature locks <code>output[0]</code> — if you underpay or redirect the BTC, the transaction is invalid and won't confirm. Either the trade happens exactly as specified or nothing happens.</p>
+      </div>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#marketplace">Part 04: Browsing the Marketplace <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- MARKETPLACE -->
+<section class="section" id="marketplace">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 04 — Buyers</div>
+    <h2>Browsing the Marketplace</h2>
+    <p class="lead">The marketplace aggregates all open atomic orders. Filter by asset, sort by price, and compare listings to find the best deal.</p>
+
+    <h3>Finding Listings</h3>
+    <p>Navigate to <strong>Marketplace → Browse</strong> and use the filters:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Filter</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Asset</strong></td><td>Show only listings for a specific asset (e.g. ZENBTC, PEPE)</td></tr>
+          <tr><td><strong>Min / Max price</strong></td><td>Filter by total BTC price range in satoshis</td></tr>
+          <tr><td><strong>Sort: price asc</strong></td><td>Cheapest first (default — best deals at top)</td></tr>
+          <tr><td><strong>Sort: price desc</strong></td><td>Most expensive first</td></tr>
+          <tr><td><strong>Sort: newest</strong></td><td>Most recently listed first</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Reading a Listing</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Asset</strong></td><td>The asset being sold</td></tr>
+          <tr><td><strong>Quantity</strong></td><td>How many units you will receive</td></tr>
+          <tr><td><strong>BTC price</strong></td><td>Total satoshis you must pay</td></tr>
+          <tr><td><strong>Price per unit</strong></td><td>BTC price ÷ quantity (for comparison)</td></tr>
+          <tr><td><strong>Blocks remaining</strong></td><td>How many blocks before this listing expires</td></tr>
+          <tr><td><strong>Seller address</strong></td><td>The Bitcoin address of the seller</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">⏱️</div>
+      <div class="callout-body">
+        <strong>Check blocks remaining</strong>
+        <p>If a listing has very few blocks remaining, another buyer or the expiry could race your fill. Choose listings with at least a few dozen blocks remaining to be safe.</p>
+      </div>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#security">Part 05: Security Model <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section class="section" id="security">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 05 — Under the Hood</div>
+    <h2>Security Model</h2>
+    <p class="lead">Atomic Swaps use two independent cryptographic mechanisms that together guarantee neither party can cheat.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-dir">SIGHASH_SINGLE | ANYONECANPAY</div>
+        <div class="concept-name">PSBT signature</div>
+        <p class="concept-desc">The seller's input[0] signature commits to <em>exactly</em> output[0] — the BTC payment to the seller. This makes it impossible to underpay or redirect the BTC.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-dir">BIP 340 Schnorr</div>
+        <div class="concept-name">seller_auth</div>
+        <p class="concept-desc">Signed over the exact trade terms (asset, quantity, price, fill UTXO). The buyer cannot alter any field in the AtomicFill message — the indexer verifies this signature on-chain.</p>
+      </div>
+    </div>
+
+    <h3>Attack Vectors — and Why They Fail</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attack</th><th>Why it fails</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Seller moves asset after listing</strong></td><td>Asset is debited at order creation — it's already in escrow</td></tr>
+          <tr><td><strong>Buyer modifies price or asset</strong></td><td><code>seller_auth</code> verification fails at the indexer</td></tr>
+          <tr><td><strong>Buyer underpays BTC</strong></td><td><code>SIGHASH_SINGLE</code> locks output[0] → TX invalid on-chain</td></tr>
+          <tr><td><strong>Buyer redirects payment to themselves</strong></td><td><code>SIGHASH_SINGLE</code> locks output[0] recipient → TX invalid</td></tr>
+          <tr><td><strong>Replay seller_auth on a different order</strong></td><td>Commitment includes the fill UTXO txid:vout — unique per order</td></tr>
+          <tr><td><strong>Two buyers fill the same order</strong></td><td>First to confirm wins. Second TX double-spends the fill UTXO → invalid</td></tr>
+          <tr><td><strong>Miner front-runs the fill</strong></td><td>Must forge <code>seller_auth</code> (impossible) or modify signed inputs (invalid)</td></tr>
+          <tr><td><strong>Buyer fills expired order</strong></td><td>Indexer checks <code>expire_index &gt; block_index</code> → rejected</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Failure Modes — Who Loses?</h3>
+    <div class="callout tip">
+      <div class="callout-icon">🛡️</div>
+      <div class="callout-body">
+        <strong>Nobody ever loses funds</strong>
+        <p>In every failure scenario — low fee, cancel race, double fill, relay outage — either the trade completes correctly or it doesn't happen. There is no partial state where funds are lost.</p>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Scenario</th><th>Outcome</th></tr></thead>
+        <tbody>
+          <tr><td>Buyer's fill TX doesn't confirm (fee too low)</td><td>Nothing happens. Buyer retries or gives up. Nobody loses funds.</td></tr>
+          <tr><td>Seller cancels while buyer is composing</td><td>Buyer's TX fails (fill UTXO already spent). BTC never sent.</td></tr>
+          <tr><td>Two buyers race to fill</td><td>Winner gets asset. Loser's TX fails cleanly. Nobody loses BTC.</td></tr>
+          <tr><td>Relay goes offline</td><td>Orders still visible on-chain via API. PSBTs may need re-sharing.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#lifecycle">Part 06: Order Lifecycle <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- LIFECYCLE -->
+<section class="section" id="lifecycle">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 06 — Under the Hood</div>
+    <h2>Order Lifecycle</h2>
+    <p class="lead">Every atomic order moves through a clear state machine. The fill UTXO is the on-chain anchor — its fate determines the order's outcome.</p>
+
+    <svg width="100%" viewBox="0 0 680 270" style="display:block;margin:24px 0;">
+      <defs><marker id="arwL" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <g style="fill:#EEEDFE;stroke:#534AB7;stroke-width:0.5;"><rect x="255" y="20" width="170" height="50" rx="10"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#26215C;" x="340" y="41" text-anchor="middle" dominant-baseline="central">AtomicSell TX</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#534AB7;" x="340" y="57" text-anchor="middle" dominant-baseline="central">asset escrowed · fill UTXO created</text>
+      <line x1="340" y1="70" x2="340" y2="98" stroke="#888780" stroke-width="1.2" marker-end="url(#arwL)"/>
+      <g style="fill:#E1F5EE;stroke:#0F6E56;stroke-width:1;"><rect x="255" y="100" width="170" height="50" rx="10"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:14px;font-weight:500;fill:#085041;" x="340" y="121" text-anchor="middle" dominant-baseline="central">OPEN</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#0F6E56;" x="340" y="137" text-anchor="middle" dominant-baseline="central">listing visible · buyer can fill</text>
+      <line x1="290" y1="150" x2="155" y2="178" stroke="#888780" stroke-width="1.1" marker-end="url(#arwL)"/>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10px;fill:#6b6860;" x="198" y="162" text-anchor="middle">buyer fills</text>
+      <line x1="340" y1="150" x2="340" y2="178" stroke="#888780" stroke-width="1.1" marker-end="url(#arwL)"/>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10px;fill:#6b6860;" x="372" y="165" text-anchor="start">seller cancels</text>
+      <line x1="390" y1="150" x2="525" y2="178" stroke="#888780" stroke-width="1.1" marker-end="url(#arwL)"/>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10px;fill:#6b6860;" x="466" y="160" text-anchor="middle">block height</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:10px;fill:#6b6860;" x="466" y="173" text-anchor="middle">≥ expire_index</text>
+      <g style="fill:#E6F1FB;stroke:#185FA5;stroke-width:0.5;"><rect x="70" y="180" width="155" height="50" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#042C53;" x="147" y="201" text-anchor="middle" dominant-baseline="central">FILLED</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#185FA5;" x="147" y="217" text-anchor="middle" dominant-baseline="central">asset to buyer · BTC to seller</text>
+      <g style="fill:#F1EFE8;stroke:#5F5E5A;stroke-width:0.5;"><rect x="255" y="180" width="170" height="50" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#2C2C2A;" x="340" y="201" text-anchor="middle" dominant-baseline="central">CANCELLED</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#5F5E5A;" x="340" y="217" text-anchor="middle" dominant-baseline="central">asset refunded to seller</text>
+      <g style="fill:#FAEEDA;stroke:#854F0B;stroke-width:0.5;"><rect x="455" y="180" width="155" height="50" rx="8"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#412402;" x="532" y="201" text-anchor="middle" dominant-baseline="central">EXPIRED</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#854F0B;" x="532" y="217" text-anchor="middle" dominant-baseline="central">asset refunded to seller</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#6b6860;" x="340" y="255" text-anchor="middle">The fill UTXO is the on-chain anchor — its fate determines the order outcome</text>
+    </svg>
+
+    <h3>The Fill UTXO Explained</h3>
+    <p>The fill UTXO is a 546-satoshi dust output created by the seller's <code>AtomicSell</code> TX. It acts as a binding anchor — the asset's fate is tied to this single output:</p>
+    <div class="flow">
+      <div>Fill UTXO spent by <span class="flow-node">AtomicFill TX</span> <span class="flow-arrow">→</span> <span style="color:var(--green)">asset credited to buyer</span></div>
+      <div style="margin-top:4px;">Fill UTXO spent by <span class="flow-node">any other TX</span> <span class="flow-arrow">→</span> <span style="color:var(--gray)">implicit cancel → asset refunded to seller</span></div>
+      <div style="margin-top:4px;">Fill UTXO <span class="flow-node">unspent past expire_index</span> <span class="flow-arrow">→</span> <span style="color:var(--yellow)">expiry → asset refunded to seller</span></div>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#transactions">Part 07: Transaction Structure <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- TRANSACTIONS -->
+<section class="section" id="transactions">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 07 — Under the Hood</div>
+    <h2>Transaction Structure</h2>
+    <p class="lead">Two Bitcoin transactions make up a complete atomic swap. Understanding their structure helps developers and power users verify correctness.</p>
+
+    <h3>Transaction 1 — AtomicSell (Seller)</h3>
+    <pre>INPUTS:
+  [0] Seller's funding UTXO  <span class="c">← signed SIGHASH_ALL, standard</span>
+
+OUTPUTS:
+  [0] ACME data carrier      <span class="c">← AtomicSell envelope (P2WSH/OLGA)</span>
+  [1] Fill UTXO: 546 sats    <span class="c">← escrow anchor (fill_vout = 1)</span>
+  [2] Change to seller</pre>
+
+    <p>The indexer processes this by debiting the asset from the seller and recording the order with <code>status = "open"</code>.</p>
+
+    <h3>Transaction 2 — AtomicFill (Buyer)</h3>
+    <pre>INPUTS:
+  [0] Fill UTXO              <span class="c">← seller pre-signed (SIGHASH_SINGLE|ANYONECANPAY)</span>
+      ↳ commits to output[0] only
+  [1..N] Buyer's BTC UTXOs  <span class="c">← buyer signs (SIGHASH_ALL)</span>
+
+OUTPUTS:
+  [0] BTC to seller          <span class="c">← btc_price sats · locked by seller's sig</span>
+  [1] Dust to buyer          <span class="c">← 546 sats · destination_idx = 1</span>
+  [2] ACME data carrier      <span class="c">← AtomicFill envelope (P2WSH/OLGA)</span>
+  [3] Buyer's BTC change</pre>
+
+    <div class="callout info">
+      <div class="callout-icon">🔑</div>
+      <div class="callout-body">
+        <strong>Why SIGHASH_SINGLE|ANYONECANPAY?</strong>
+        <p><code>SIGHASH_SINGLE</code> means the seller's signature only covers input[0] and output[0] — so the buyer can freely add more inputs and outputs without invalidating the seller's sig. <code>ANYONECANPAY</code> means anyone can be input[0]'s signer, enabling any buyer to complete the transaction.</p>
+      </div>
+    </div>
+
+    <h3>The seller_auth Commitment</h3>
+    <p>Before signing the fill PSBT, the seller also signs a <strong>commitment hash</strong> that ties together all trade terms:</p>
+    <pre>commitment = SHA256(
+  "ACME_ATOMIC_SWAP\0"  <span class="c">← 16-byte domain separator</span>
+  give_asset            <span class="c">← UTF-8 asset name</span>
+  "\0"                  <span class="c">← separator</span>
+  give_quantity         <span class="c">← 8 bytes big-endian u64</span>
+  btc_price             <span class="c">← 8 bytes big-endian u64</span>
+  fill_utxo_txid        <span class="c">← 32 bytes (txid of AtomicSell TX)</span>
+  fill_utxo_vout        <span class="c">← 4 bytes big-endian u32</span>
+)
+
+seller_auth = schnorr_sign(seller_private_key, commitment)</pre>
+
+    <p>Including the <code>fill_utxo_txid:vout</code> makes the auth unique per order — it cannot be replayed across different listings.</p>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#api">Part 08: API Reference <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- API -->
+<section class="section" id="api">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 08 — Under the Hood</div>
+    <h2>API Reference</h2>
+    <p class="lead">Four key endpoints power the atomic swap workflow — two for composing transactions and two for the marketplace.</p>
+
+    <h3>Compose: Create a Listing</h3>
+    <p><code>POST /v2/compose/atomicsell</code></p>
+    <pre>{
+  <span class="b">"source"</span>:        <span class="g">"tb1q_seller..."</span>,
+  <span class="b">"give_asset"</span>:    <span class="g">"ZENBTC"</span>,
+  <span class="b">"give_quantity"</span>: <span class="a">1</span>,
+  <span class="b">"btc_price"</span>:     <span class="a">100000000</span>,    <span class="c">// 1 BTC in satoshis</span>
+  <span class="b">"expiration"</span>:    <span class="a">1000</span>,          <span class="c">// blocks (~7 days)</span>
+  <span class="b">"utxos"</span>:        [...],
+  <span class="b">"fee_rate"</span>:      <span class="a">5.0</span>
+}</pre>
+    <p>Returns a PSBT to sign, the fill UTXO coordinates, and the <code>commitment_hash</code> to sign as your <code>seller_auth</code>.</p>
+
+    <h3>Compose: Fill an Order</h3>
+    <p><code>POST /v2/compose/atomicfill</code></p>
+    <pre>{
+  <span class="b">"order_tx_hash"</span>: <span class="g">"abc123..."</span>,
+  <span class="b">"buyer_address"</span>: <span class="g">"tb1q_buyer..."</span>,
+  <span class="b">"utxos"</span>:        [...],
+  <span class="b">"fee_rate"</span>:      <span class="a">5.0</span>
+}</pre>
+    <p>Returns the complete PSBT merging the seller's pre-signed input with the buyer's BTC inputs. Sign with <code>SIGHASH_ALL</code> and broadcast.</p>
+
+    <h3>Marketplace: Browse Listings</h3>
+    <p><code>GET /v2/marketplace/listings</code></p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Query param</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>asset</code></td><td>Filter by asset name</td></tr>
+          <tr><td><code>min_price</code> / <code>max_price</code></td><td>Filter by satoshi price range</td></tr>
+          <tr><td><code>sort</code></td><td><code>price_asc</code> (default), <code>price_desc</code>, <code>newest</code></td></tr>
+          <tr><td><code>limit</code> / <code>offset</code></td><td>Pagination</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Marketplace: Submit a Listing</h3>
+    <p><code>POST /v2/marketplace/listings</code> — called after broadcasting your <code>AtomicSell</code> TX.</p>
+    <pre>{
+  <span class="b">"order_tx_hash"</span>: <span class="g">"abc123..."</span>,
+  <span class="b">"partial_psbt"</span>:  <span class="g">"cHNidP8B..."</span>,  <span class="c">// fill template, base64</span>
+  <span class="b">"seller_auth"</span>:   <span class="g">"aabbccdd..."</span>   <span class="c">// 64-byte Schnorr sig, hex</span>
+}</pre>
+
+    <h3>Query: Order Status</h3>
+    <p><code>GET /v2/atomic/orders/:tx_hash</code> — returns full order details including fill information when filled.</p>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#comparison">Comparison <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="section" id="comparison">
+  <div class="section-inner">
+    <div class="part-eyebrow">Reference</div>
+    <h2>Atomic Swaps vs. Other Methods</h2>
+    <p class="lead">Atomic Swaps are the most efficient way to trade ACME assets for Bitcoin. Here's how they compare to existing methods.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Feature</th><th>Atomic Swap</th><th>BTCPay Order</th><th>Dispenser</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Transactions required</strong></td><td><span class="badge green"><span class="badge-dot"></span>2 TXs</span></td><td><span class="badge red"><span class="badge-dot"></span>3 TXs</span></td><td><span class="badge yellow"><span class="badge-dot"></span>2 TXs</span></td></tr>
+          <tr><td><strong>Seller online at fill time</strong></td><td><span class="badge green"><span class="badge-dot"></span>No</span></td><td><span class="badge red"><span class="badge-dot"></span>Yes</span></td><td><span class="badge green"><span class="badge-dot"></span>No</span></td></tr>
+          <tr><td><strong>Trustless (no counterparty risk)</strong></td><td><span class="badge green"><span class="badge-dot"></span>Yes</span></td><td><span class="badge yellow"><span class="badge-dot"></span>Partial</span></td><td><span class="badge green"><span class="badge-dot"></span>Yes</span></td></tr>
+          <tr><td><strong>Asset escrowed on-chain</strong></td><td><span class="badge green"><span class="badge-dot"></span>Yes</span></td><td><span class="badge green"><span class="badge-dot"></span>Yes</span></td><td><span class="badge green"><span class="badge-dot"></span>Yes</span></td></tr>
+          <tr><td><strong>Price flexibility</strong></td><td><span class="badge green"><span class="badge-dot"></span>Any BTC amount</span></td><td><span class="badge green"><span class="badge-dot"></span>Any BTC amount</span></td><td><span class="badge yellow"><span class="badge-dot"></span>Fixed dispensation rate</span></td></tr>
+          <tr><td><strong>Expiry / cancel</strong></td><td><span class="badge green"><span class="badge-dot"></span>Block-based expiry + cancel</span></td><td><span class="badge green"><span class="badge-dot"></span>Yes</span></td><td><span class="badge yellow"><span class="badge-dot"></span>Give remaining balance only</span></td></tr>
+          <tr><td><strong>Marketplace browsable</strong></td><td><span class="badge green"><span class="badge-dot"></span>Yes</span></td><td><span class="badge yellow"><span class="badge-dot"></span>Limited</span></td><td><span class="badge yellow"><span class="badge-dot"></span>Limited</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <svg width="100%" viewBox="0 0 680 130" style="display:block;margin:20px 0;">
+      <g style="fill:#EAF3DE;stroke:#3B6D11;stroke-width:0.5;"><rect x="40" y="30" width="185" height="70" rx="10"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#173404;" x="132" y="58" text-anchor="middle" dominant-baseline="central">Atomic Swap</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#3B6D11;" x="132" y="78" text-anchor="middle" dominant-baseline="central">2 TXs · trustless · async</text>
+      <g style="fill:#FAEEDA;stroke:#854F0B;stroke-width:0.5;"><rect x="247" y="30" width="185" height="70" rx="10"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#412402;" x="339" y="58" text-anchor="middle" dominant-baseline="central">BTCPay Order</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#854F0B;" x="339" y="78" text-anchor="middle" dominant-baseline="central">3 TXs · seller online required</text>
+      <g style="fill:#F1EFE8;stroke:#5F5E5A;stroke-width:0.5;"><rect x="454" y="30" width="185" height="70" rx="10"/></g>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:13px;font-weight:500;fill:#2C2C2A;" x="546" y="58" text-anchor="middle" dominant-baseline="central">Dispenser</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#5F5E5A;" x="546" y="78" text-anchor="middle" dominant-baseline="central">2 TXs · fixed rate · no order book</text>
+      <text style="font-family:'Söhne',system-ui,sans-serif;font-size:11px;fill:#6b6860;" x="340" y="118" text-anchor="middle">Atomic Swaps combine the trustlessness of dispensers with the flexibility of order books</text>
+    </svg>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#glossary">Glossary <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- GLOSSARY -->
+<section class="section" id="glossary">
+  <div class="section-inner">
+    <div class="part-eyebrow">Reference</div>
+    <h2>Glossary</h2>
+    <p style="margin-bottom:28px;">Key terms used throughout this guide.</p>
+
+    <div style="border-top:1px solid var(--border);">
+      <div style="border-bottom:1px solid var(--border);padding:14px 0;display:grid;grid-template-columns:160px 1fr;gap:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">AtomicSell</div>
+        <div style="font-size:13.5px;color:var(--text-secondary);line-height:1.7;">Wire message (MSG_ID=15) broadcast by the seller to create an on-chain order. Escrows the asset and creates the fill UTXO.</div>
+      </div>
+      <div style="border-bottom:1px solid var(--border);padding:14px 0;display:grid;grid-template-columns:160px 1fr;gap:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">AtomicFill</div>
+        <div style="font-size:13.5px;color:var(--text-secondary);line-height:1.7;">Wire message (MSG_ID=16) broadcast by the buyer inside the fill transaction. References the order and carries the seller_auth.</div>
+      </div>
+      <div style="border-bottom:1px solid var(--border);padding:14px 0;display:grid;grid-template-columns:160px 1fr;gap:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">Fill UTXO</div>
+        <div style="font-size:13.5px;color:var(--text-secondary);line-height:1.7;">A 546-satoshi dust output created by the AtomicSell TX that acts as the escrow anchor. Spending it as an AtomicFill transfers the asset; spending it any other way cancels the order.</div>
+      </div>
+      <div style="border-bottom:1px solid var(--border);padding:14px 0;display:grid;grid-template-columns:160px 1fr;gap:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">seller_auth</div>
+        <div style="font-size:13.5px;color:var(--text-secondary);line-height:1.7;">A 64-byte BIP 340 Schnorr signature over a commitment hash that includes the asset, quantity, price, and fill UTXO coordinates. Prevents buyers from modifying trade terms.</div>
+      </div>
+      <div style="border-bottom:1px solid var(--border);padding:14px 0;display:grid;grid-template-columns:160px 1fr;gap:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">PSBT</div>
+        <div style="font-size:13.5px;color:var(--text-secondary);line-height:1.7;">Partially Signed Bitcoin Transaction. The seller creates a partial PSBT signing input[0] (fill UTXO); the buyer completes it by adding BTC inputs and outputs.</div>
+      </div>
+      <div style="border-bottom:1px solid var(--border);padding:14px 0;display:grid;grid-template-columns:160px 1fr;gap:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">SIGHASH_SINGLE<br>| ANYONECANPAY</div>
+        <div style="font-size:13.5px;color:var(--text-secondary);line-height:1.7;">Bitcoin sighash type (0x83) used by the seller. Commits only to input[0] and output[0], allowing the buyer to add more inputs and outputs without invalidating the seller's signature.</div>
+      </div>
+      <div style="border-bottom:1px solid var(--border);padding:14px 0;display:grid;grid-template-columns:160px 1fr;gap:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">Commitment hash</div>
+        <div style="font-size:13.5px;color:var(--text-secondary);line-height:1.7;">The SHA256 digest of the trade terms signed by the seller to produce seller_auth. Uniquely identifies the trade — it includes the fill UTXO txid:vout, preventing auth replay across orders.</div>
+      </div>
+      <div style="border-bottom:1px solid var(--border);padding:14px 0;display:grid;grid-template-columns:160px 1fr;gap:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">expire_index</div>
+        <div style="font-size:13.5px;color:var(--text-secondary);line-height:1.7;">The Bitcoin block height at which an open order expires. Computed as <code>creation_block + expiration</code>. The indexer automatically refunds the escrowed asset when this block is processed.</div>
+      </div>
+      <div style="border-bottom:1px solid var(--border);padding:14px 0;display:grid;grid-template-columns:160px 1fr;gap:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">Implicit cancel</div>
+        <div style="font-size:13.5px;color:var(--text-secondary);line-height:1.7;">When the seller spends the fill UTXO in any transaction other than an AtomicFill. The indexer detects this and refunds the asset — no explicit cancel message needed.</div>
+      </div>
+      <div style="padding:14px 0;display:grid;grid-template-columns:160px 1fr;gap:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">Escrow</div>
+        <div style="font-size:13.5px;color:var(--text-secondary);line-height:1.7;">The state where the seller's asset is debited from their balance but not yet credited to a buyer. The asset is held by the protocol and guaranteed to be returned (via fill, cancel, or expiry).</div>
+      </div>
+    </div>
+
+    <div style="margin-top:48px;padding-top:22px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:12px;color:var(--text-hint);">ACME Atomic Swaps User Guide · v1.0</span>
+      <a href="#intro" style="font-size:12px;color:var(--text-tertiary);text-decoration:none;transition:color 0.12s;" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='var(--text-tertiary)'">↑ Back to top</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+var ROOT = document.documentElement;
+var sidebarThemeBtn  = document.getElementById('sidebar-theme-btn');
+var sidebarThemeLbl  = document.getElementById('sidebar-theme-label');
+var mobDrawerThemeBtn = document.getElementById('mob-drawer-theme-btn');
+var mobDrawerThemeLbl = document.getElementById('mob-drawer-theme-label');
+var mobThemeBtn      = document.getElementById('mob-theme-btn');
+var mobSun           = document.getElementById('mob-sun');
+var mobMoon          = document.getElementById('mob-moon');
+
+function setTheme(dark) {
+  ROOT.classList.toggle('dark', dark);
+  var label = dark ? 'Dark mode' : 'Light mode';
+  if (sidebarThemeLbl)   sidebarThemeLbl.textContent  = label;
+  if (mobDrawerThemeLbl) mobDrawerThemeLbl.textContent = label;
+  if (mobSun)  mobSun.style.display  = dark ? 'none'  : 'block';
+  if (mobMoon) mobMoon.style.display = dark ? 'block' : 'none';
+  try { localStorage.setItem('guide-theme', dark ? 'dark' : 'light'); } catch(e) {}
+}
+function toggleTheme() { setTheme(!ROOT.classList.contains('dark')); }
+if (sidebarThemeBtn)   sidebarThemeBtn.addEventListener('click',   toggleTheme);
+if (mobThemeBtn)       mobThemeBtn.addEventListener('click',       toggleTheme);
+if (mobDrawerThemeBtn) mobDrawerThemeBtn.addEventListener('click', toggleTheme);
+(function() {
+  var saved; try { saved = localStorage.getItem('guide-theme'); } catch(e) {}
+  var osDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(saved === 'dark' || (!saved && osDark));
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    var s; try { s = localStorage.getItem('guide-theme'); } catch(ex) {}
+    if (!s) setTheme(e.matches);
+  });
+})();
+
+var mobBar     = document.getElementById('mob-bar');
+var mobOverlay = document.getElementById('mob-overlay');
+var mobDrawer  = document.getElementById('mob-drawer');
+var mobMenuBtn = document.getElementById('mob-menu-btn');
+var mobCloseBtn = document.getElementById('mob-close-btn');
+var MOBILE_BP = 860;
+
+function syncTopBar() {
+  if (!mobBar) return;
+  mobBar.style.display = window.innerWidth <= MOBILE_BP ? 'flex' : 'none';
+}
+syncTopBar();
+window.addEventListener('resize', syncTopBar);
+
+function openDrawer() {
+  if (!mobDrawer || !mobOverlay) return;
+  mobOverlay.style.display = 'block';
+  mobDrawer.style.display  = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  if (!mobDrawer || !mobOverlay) return;
+  mobOverlay.style.display = 'none';
+  mobDrawer.style.display  = 'none';
+  document.body.style.overflow = '';
+}
+if (mobMenuBtn)  mobMenuBtn.addEventListener('click',  openDrawer);
+if (mobCloseBtn) mobCloseBtn.addEventListener('click', closeDrawer);
+if (mobOverlay)  mobOverlay.addEventListener('click',  closeDrawer);
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDrawer(); });
+if (mobDrawer) {
+  mobDrawer.querySelectorAll('a.nav-item').forEach(function(link) {
+    link.addEventListener('click', closeDrawer);
+  });
+}
+
+var allNavLinks = document.querySelectorAll('.nav-item[href^="#"]');
+var allSections = [];
+allNavLinks.forEach(function(l) {
+  var id = l.getAttribute('href').slice(1);
+  var el = document.getElementById(id);
+  if (el) allSections.push(el);
+});
+function setActive(id) {
+  allNavLinks.forEach(function(l) {
+    l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+  });
+}
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) setActive(entry.target.id);
+  });
+}, { rootMargin: '-10% 0px -75% 0px' });
+allSections.forEach(function(s) { observer.observe(s); });
+</script>
+</body>
+</html>

@@ -1,0 +1,1944 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACME Cortex — Creator's Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiempos+Text:ital,wght@0,400;0,500;1,400&family=Söhne:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* ─── Claude UI Token System ─── */
+  :root {
+    /* Page backgrounds */
+    --bg-page:       #f9f8f5;   /* warm off-white — Claude's main canvas */
+    --bg-sidebar:    #f3f2ee;   /* slightly darker warm panel */
+    --bg-surface:    #ffffff;   /* card / elevated surface */
+    --bg-surface2:   #f9f8f5;   /* inset / code surface */
+    --bg-hover:      rgba(0,0,0,0.035);
+    --bg-active:     rgba(218,119,86,0.09);
+
+    /* Borders — Claude uses very thin, warm-grey borders */
+    --border:        rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.13);
+
+    /* Text */
+    --text-primary:  #1a1915;   /* near-black, warm */
+    --text-secondary:#6b6860;   /* muted warm grey */
+    --text-tertiary: #9c9a91;   /* very muted */
+    --text-hint:     #bbb9b0;
+
+    /* Claude's accent — the warm terracotta/orange */
+    --accent:        #da7756;   /* Claude's primary brand color */
+    --accent-light:  rgba(218,119,86,0.12);
+    --accent-dim:    rgba(218,119,86,0.07);
+    --accent-text:   #b85c3a;   /* darker for text on light bg */
+
+    /* Semantic colors — muted, warm-toned */
+    --green:         #3d7a5c;
+    --green-light:   rgba(61,122,92,0.1);
+    --yellow:        #8a6c2a;
+    --yellow-light:  rgba(138,108,42,0.1);
+    --blue:          #3b6ea8;
+    --blue-light:    rgba(59,110,168,0.1);
+    --gray:          #6b6860;
+    --gray-light:    rgba(107,104,96,0.1);
+
+    /* Typography */
+    --font-body:     'Söhne', -apple-system, system-ui, sans-serif;
+    --font-serif:    'Tiempos Text', Georgia, 'Times New Roman', serif;
+    --font-mono:     'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace;
+
+    /* Layout */
+    --sidebar-w:     256px;
+    --radius-sm:     6px;
+    --radius-md:     8px;
+    --radius-lg:     12px;
+  }
+
+  /* ─── Dark mode token overrides ─── */
+  html.dark {
+    --bg-page:       #1a1915;
+    --bg-sidebar:    #151512;
+    --bg-surface:    #222118;
+    --bg-surface2:   #1a1915;
+    --bg-hover:      rgba(255,255,255,0.05);
+    --bg-active:     rgba(218,119,86,0.13);
+
+    --border:        rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.13);
+
+    --text-primary:  #e8e6df;
+    --text-secondary:#9c9a8e;
+    --text-tertiary: #6b6960;
+    --text-hint:     #48473f;
+
+    --accent:        #da7756;
+    --accent-light:  rgba(218,119,86,0.15);
+    --accent-dim:    rgba(218,119,86,0.09);
+    --accent-text:   #e8906f;
+
+    --green:         #5aa882;
+    --green-light:   rgba(90,168,130,0.12);
+    --yellow:        #c49a3a;
+    --yellow-light:  rgba(196,154,58,0.12);
+    --blue:          #6b9fd4;
+    --blue-light:    rgba(107,159,212,0.12);
+    --gray:          #9c9a8e;
+    --gray-light:    rgba(156,154,142,0.1);
+  }
+
+  html.dark pre { background: #111109; }
+
+  /* colour-theme-aware transition — only on color/bg, not layout */
+  body, .sidebar, .hero, .callout, .concept-card, .tier-card,
+  .verify-card, .table-wrap, .flow, .limit-item, .tag-chip,
+  .next-btn, .img-placeholder, .img-ph-icon, .step-num,
+  .flow-node, pre, .sidebar-header, thead tr,
+  #mob-bar, #mob-drawer, #mob-drawer-head {
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  }
+
+  /* ─── Desktop sidebar theme toggle ─── */
+  #sidebar-theme-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    cursor: pointer;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    width: 100%;
+    text-align: left;
+    color: var(--text-tertiary);
+    font-family: var(--font-body);
+    font-size: 13px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #sidebar-theme-btn:hover { color: var(--text-secondary); background: var(--bg-hover); }
+  #sidebar-theme-btn:active { background: var(--bg-hover); }
+
+  #sidebar-theme-label { flex: 1; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    display: flex;
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .sidebar-header {
+    padding: 20px 18px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Claude logo mark — simple circle with C */
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 14px;
+  }
+
+  .logo-mark {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-mark svg { width: 14px; height: 14px; fill: #fff; }
+
+  .logo-wordmark {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .sidebar-doc-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-doc-title {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+
+  .sidebar-nav { padding: 8px 0 24px; flex: 1; }
+
+  .nav-group-label {
+    padding: 12px 18px 4px;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--text-hint);
+    text-transform: uppercase;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 18px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 400;
+    border-left: 2px solid transparent;
+    transition: color 0.12s, background 0.12s;
+    border-radius: 0;
+    line-height: 1.4;
+  }
+
+  .nav-item:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+  }
+
+  .nav-item.active {
+    color: var(--accent-text);
+    border-left-color: var(--accent);
+    background: var(--accent-dim);
+    font-weight: 500;
+  }
+
+  .nav-item .num {
+    font-size: 11px;
+    color: var(--text-hint);
+    width: 18px;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .nav-item.active .num { color: rgba(218,119,86,0.5); }
+  .nav-item.sub { padding-left: 34px; font-size: 13px; }
+
+  /* ─── MAIN ─── */
+  .main { margin-left: var(--sidebar-w); flex: 1; min-width: 0; }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    padding: 56px 64px 0;
+  }
+
+  .hero-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-bottom: 20px;
+  }
+
+  .hero-breadcrumb span { color: var(--text-hint); }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--accent-light);
+    color: var(--accent-text);
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(218,119,86,0.2);
+  }
+
+  .hero h1 {
+    font-family: var(--font-serif);
+    font-size: 42px;
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+    max-width: 560px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent-text);
+  }
+
+  .hero-desc {
+    font-size: 16px;
+    color: var(--text-secondary);
+    max-width: 520px;
+    line-height: 1.75;
+    margin-bottom: 36px;
+  }
+
+  /* Hero visual placeholder */
+  .hero-visual {
+    margin: 0 -64px;
+    border-top: 1px solid var(--border);
+    padding: 0;
+    background: var(--bg-page);
+  }
+
+  /* ─── IMAGE PLACEHOLDERS ─── */
+  .img-placeholder {
+    background: var(--bg-surface);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: default;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .img-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.4;
+  }
+
+  .img-placeholder:hover {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .img-ph-icon {
+    width: 34px; height: 34px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-surface);
+    color: var(--text-tertiary);
+    position: relative;
+    z-index: 1;
+  }
+
+  .img-ph-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.6;
+    max-width: 420px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .img-ph-tag {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    background: var(--bg-surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2px 10px;
+    color: var(--text-tertiary);
+    position: relative;
+    z-index: 1;
+  }
+
+  .ph-wide   { width: 100%; height: 200px; margin: 24px 0; }
+  .ph-medium { width: 100%; height: 160px; margin: 20px 0; }
+
+  /* ─── SECTIONS ─── */
+  .section { border-bottom: 1px solid var(--border); }
+
+  .section-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 56px 64px;
+  }
+
+  /* ─── TYPOGRAPHY ─── */
+  .part-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 12px;
+  }
+
+  .part-eyebrow::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  h2 {
+    font-family: var(--font-serif);
+    font-size: 30px;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 36px 0 12px;
+  }
+
+  h4 {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin: 24px 0 8px;
+  }
+
+  p { color: var(--text-secondary); margin-bottom: 14px; line-height: 1.75; }
+  p strong { color: var(--text-primary); font-weight: 500; }
+
+  .lead {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    line-height: 1.8;
+    padding-left: 16px;
+    border-left: 2px solid var(--accent);
+  }
+
+  /* ─── CALLOUTS — Claude-style notice blocks ─── */
+  .callout {
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    margin: 16px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    border: 1px solid transparent;
+  }
+
+  .callout-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; line-height: 1.2; }
+  .callout-body strong { color: var(--text-primary); display: block; margin-bottom: 2px; font-size: 13.5px; font-weight: 500; }
+  .callout-body p { margin: 0; font-size: 13.5px; line-height: 1.65; }
+
+  .callout.tip  { background: var(--green-light);  border-color: rgba(61,122,92,0.2); }
+  .callout.tip .callout-body strong { color: #2d5c43; }
+  .callout.info { background: var(--blue-light);   border-color: rgba(59,110,168,0.2); }
+  .callout.info .callout-body strong { color: #2c5280; }
+  .callout.warn { background: var(--yellow-light); border-color: rgba(138,108,42,0.2); }
+  .callout.warn .callout-body strong { color: #6b5120; }
+
+  /* ─── CONCEPT GRID ─── */
+  .concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 24px 0; }
+
+  .concept-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .concept-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+  }
+
+  .concept-dir {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent-text);
+    margin-bottom: 6px;
+    letter-spacing: 0.03em;
+  }
+
+  .concept-name {
+    font-family: var(--font-serif);
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .concept-desc { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+
+  /* ─── STEPS ─── */
+  .steps { margin: 20px 0; }
+
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+    font-size: 11.5px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .step-body strong { color: var(--text-primary); display: block; margin-bottom: 1px; font-size: 14px; font-weight: 500; }
+  .step-body p { margin: 0; font-size: 13.5px; color: var(--text-secondary); }
+
+  /* ─── TABLES — Claude uses clean, minimal tables ─── */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 18px 0;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+
+  thead tr { background: var(--bg-surface2); }
+
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 11px 14px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--bg-hover); }
+  td strong { color: var(--text-primary); font-weight: 500; }
+
+  td code, p code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--bg-surface2);
+    padding: 1.5px 6px;
+    border-radius: 4px;
+    color: var(--accent-text);
+    border: 1px solid var(--border);
+  }
+
+  /* ─── BADGES ─── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 500;
+    vertical-align: middle;
+    font-family: var(--font-body);
+  }
+
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  .badge.green  { background: var(--green-light);  color: var(--green);  border: 1px solid rgba(61,122,92,0.2); }
+  .badge.green .badge-dot  { background: var(--green); }
+  .badge.yellow { background: var(--yellow-light); color: var(--yellow); border: 1px solid rgba(138,108,42,0.2); }
+  .badge.yellow .badge-dot { background: var(--yellow); }
+  .badge.blue   { background: var(--blue-light);   color: var(--blue);   border: 1px solid rgba(59,110,168,0.2); }
+  .badge.blue .badge-dot   { background: var(--blue); }
+  .badge.gray   { background: var(--gray-light);   color: var(--gray);   border: 1px solid rgba(107,104,96,0.2); }
+  .badge.gray .badge-dot   { background: var(--gray); }
+
+  /* ─── VERIFICATION CARDS ─── */
+  .verify-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 24px 0; }
+
+  .verify-card {
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+  }
+
+  .verify-card.is-green  { border-color: rgba(61,122,92,0.25);   background: rgba(61,122,92,0.04); }
+  .verify-card.is-yellow { border-color: rgba(138,108,42,0.22);  background: rgba(138,108,42,0.04); }
+  .verify-card.is-blue   { border-color: rgba(59,110,168,0.22);  background: rgba(59,110,168,0.04); }
+
+  .verify-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin: 9px 0 5px; }
+  .verify-desc  { font-size: 12.5px; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+
+  /* ─── CODE BLOCKS ─── */
+  pre {
+    background: #f3f2ee;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 16px 0;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+
+  pre .c { color: var(--text-hint); }
+  pre .g { color: var(--green); }
+  pre .y { color: var(--yellow); }
+
+  /* ─── STORAGE TIERS ─── */
+  .tier-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 18px 0; }
+
+  .tier-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 15px;
+    transition: border-color 0.15s;
+  }
+
+  .tier-card:hover { border-color: var(--border-strong); }
+
+  .tier-name { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
+  .tier-size { font-family: var(--font-mono); font-size: 11px; color: var(--accent-text); margin-bottom: 8px; }
+  .tier-desc { font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.55; }
+
+  /* ─── TAG CHIPS ─── */
+  .tag-group { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 18px; }
+
+  .tag-chip {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 3px 10px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    transition: border-color 0.12s, color 0.12s, background 0.12s;
+    cursor: default;
+  }
+
+  .tag-chip:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-dim); }
+
+  /* ─── FLOW DIAGRAM ─── */
+  .flow {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin: 18px 0;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 2;
+    overflow-x: auto;
+  }
+
+  .flow-node {
+    display: inline-block;
+    background: var(--bg-surface2);
+    border: 1px solid var(--border-strong);
+    border-radius: 5px;
+    padding: 2px 9px;
+    color: var(--text-primary);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .flow-rel    { color: var(--accent-text); font-size: 11px; }
+  .flow-arrow  { color: var(--text-hint); }
+  .flow-comment { color: var(--text-hint); font-size: 11px; }
+
+  /* ─── LIMITS GRID ─── */
+  .limits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 18px 0; }
+
+  .limit-item {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 14px;
+    text-align: center;
+  }
+
+  .limit-val {
+    font-family: var(--font-serif);
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--accent-text);
+    display: block;
+    margin-bottom: 4px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .limit-label { font-size: 11.5px; color: var(--text-tertiary); }
+
+  /* ─── GLOSSARY ─── */
+  .glossary-item {
+    border-bottom: 1px solid var(--border);
+    padding: 14px 0;
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .glossary-item:last-child { border-bottom: none; }
+
+  .glossary-term {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    padding-top: 1px;
+  }
+
+  .glossary-def { font-size: 13.5px; color: var(--text-secondary); line-height: 1.65; }
+
+  /* ─── SECTION FOOTER NAV ─── */
+  .section-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 40px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+  }
+
+  .next-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px 14px;
+    background: var(--bg-surface);
+    transition: border-color 0.12s, color 0.12s, box-shadow 0.12s;
+  }
+
+  .next-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent-text);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  }
+
+  .next-btn .arr { color: var(--accent); }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+  /* ─── MOBILE: top bar (hidden by default, shown by JS on narrow screens) ─── */
+  #mob-bar {
+    display: none; /* JS sets display:flex when needed */
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 52px;
+    background: var(--bg-sidebar);
+    border-bottom: 1px solid var(--border);
+    z-index: 400;
+    align-items: center;
+    padding: 0 14px;
+    gap: 10px;
+    box-sizing: border-box;
+  }
+
+  #mob-bar-title {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #mob-theme-btn, #mob-menu-btn {
+    width: 38px; height: 38px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #mob-theme-btn:active, #mob-menu-btn:active {
+    background: var(--bg-hover);
+  }
+
+  /* ─── MOBILE: drawer overlay ─── */
+  #mob-overlay {
+    display: none; /* JS shows/hides */
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 500;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ─── MOBILE: drawer panel ─── */
+  #mob-drawer {
+    display: none; /* JS shows/hides */
+    position: fixed;
+    top: 0; left: 0;
+    width: 280px;
+    max-width: 85vw;
+    height: 100%;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    z-index: 600;
+    overflow-y: auto;
+    flex-direction: column;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  #mob-drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg-sidebar);
+    z-index: 1;
+  }
+
+  #mob-drawer-head-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #mob-close-btn {
+    width: 30px; height: 30px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    color: var(--text-tertiary);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    flex-shrink: 0;
+  }
+
+  #mob-close-btn:active { background: var(--bg-hover); }
+
+  #mob-drawer-nav {
+    flex: 1;
+    padding: 6px 0 16px;
+    overflow-y: auto;
+  }
+
+  #mob-drawer-nav .nav-group-label {
+    padding: 14px 16px 4px;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  #mob-drawer-nav .nav-item {
+    padding: 10px 16px;
+    min-height: 44px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #mob-drawer-nav .nav-item.sub {
+    padding-left: 32px;
+    font-size: 13px;
+    min-height: 38px;
+  }
+
+  #mob-drawer-footer {
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+  }
+
+  #mob-drawer-theme-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    text-align: left;
+  }
+
+  #mob-drawer-theme-btn:active { opacity: 0.7; }
+
+  /* shared toggle track used on desktop sidebar + mobile drawer */
+  .toggle-track {
+    width: 32px; height: 18px;
+    border-radius: 20px;
+    background: var(--border-strong);
+    position: relative;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+
+  html.dark .toggle-track { background: var(--accent); }
+
+  .toggle-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.18s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+
+  html.dark .toggle-thumb { transform: translateX(14px); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding-top: 52px; }
+    .hero { padding: 28px 20px 0; }
+    .hero-breadcrumb { display: none; }
+    .hero-visual { margin: 0 -20px; }
+    .hero h1 { font-size: 30px; }
+    .hero-desc { font-size: 15px; margin-bottom: 28px; }
+    .hero-badge { margin-bottom: 12px; }
+    .section-inner { padding: 32px 20px; }
+    .part-eyebrow { font-size: 10px; margin-bottom: 10px; }
+    h2 { font-size: 24px; }
+    h3 { font-size: 15px; margin: 28px 0 10px; }
+    .concept-grid, .verify-grid { grid-template-columns: 1fr; }
+    .tier-grid { grid-template-columns: repeat(2, 1fr); }
+    .limits-grid { grid-template-columns: repeat(2, 1fr); }
+    .glossary-item { grid-template-columns: 1fr; gap: 3px; }
+    .glossary-term { font-size: 13px; }
+    .table-wrap { border-radius: var(--radius-sm); }
+    table { font-size: 13px; }
+    th, td { padding: 9px 12px; }
+    .callout { padding: 12px 14px; gap: 10px; }
+    .callout-body p, .callout-body strong { font-size: 13px; }
+    .flow { font-size: 11.5px; padding: 13px 16px; }
+    pre { font-size: 11.5px; padding: 13px 14px; }
+    .ph-wide { height: 150px; }
+    .ph-medium { height: 120px; }
+    .img-ph-label { font-size: 11px; }
+    .section-footer { margin-top: 28px; padding-top: 18px; }
+    .next-btn { font-size: 12.5px; padding: 8px 13px; }
+  }
+
+  @media (max-width: 400px) {
+    .hero h1 { font-size: 26px; }
+    .section-inner { padding: 28px 16px; }
+    .hero { padding: 24px 16px 0; }
+    .hero-visual { margin: 0 -16px; }
+    .tier-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MOBILE TOP BAR -->
+<header id="mob-bar">
+  <div id="mob-bar-title">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:24px;height:24px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1.5C3.96 1.5 1.5 3.96 1.5 7s2.46 5.5 5.5 5.5 5.5-2.46 5.5-5.5S10.04 1.5 7 1.5zM7 11a4 4 0 110-8 4 4 0 010 8z" fill="white"/>
+          <circle cx="7" cy="7" r="1.8" fill="white"/>
+        </svg>
+      </div>
+      <span style="font-size:14px;font-weight:500;color:var(--text-primary);">ACME Cortex</span>
+    </div>
+  </div>
+  <button id="mob-theme-btn" aria-label="Toggle dark mode">
+    <svg id="mob-sun" width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <circle cx="9" cy="9" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="9" y1="1" x2="9" y2="3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="9" y1="14.5" x2="9" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="1" y1="9" x2="3.5" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="14.5" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="3.2" y1="3.2" x2="5" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="13" y1="13" x2="14.8" y2="14.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="3.2" y1="14.8" x2="5" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="13" y1="5" x2="14.8" y2="3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <svg id="mob-moon" width="18" height="18" viewBox="0 0 18 18" fill="none" style="display:none">
+      <path d="M15 11.5A7 7 0 016.5 3a7 7 0 000 12 7 7 0 008.5-3.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <button id="mob-menu-btn" aria-label="Open navigation">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <line x1="2" y1="5" x2="16" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="2" y1="9" x2="16" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="2" y1="13" x2="16" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+</header>
+
+<!-- MOBILE OVERLAY -->
+<div id="mob-overlay"></div>
+
+<!-- MOBILE DRAWER -->
+<nav id="mob-drawer" role="dialog" aria-label="Navigation" aria-modal="true">
+  <div id="mob-drawer-head">
+    <div id="mob-drawer-head-logo">
+      <div style="width:24px;height:24px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1.5C3.96 1.5 1.5 3.96 1.5 7s2.46 5.5 5.5 5.5 5.5-2.46 5.5-5.5S10.04 1.5 7 1.5zM7 11a4 4 0 110-8 4 4 0 010 8z" fill="white"/>
+          <circle cx="7" cy="7" r="1.8" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">ACME Cortex</div>
+        <div style="font-size:11px;color:var(--text-tertiary);">Creator's Guide</div>
+      </div>
+    </div>
+    <button id="mob-close-btn" aria-label="Close navigation">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <line x1="2" y1="2" x2="14" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="14" y1="2" x2="2" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div id="mob-drawer-nav">
+    <div class="nav-group-label">Overview</div>
+    <a class="nav-item" href="#intro"><span class="num">—</span>What is Cortex?</a>
+    <a class="nav-item" href="#building-blocks"><span class="num">—</span>Building Blocks</a>
+
+    <div class="nav-group-label">Core Features</div>
+    <a class="nav-item" href="#profiles"><span class="num">01</span>Artist Profiles</a>
+    <a class="nav-item" href="#collections"><span class="num">02</span>Collections</a>
+    <a class="nav-item" href="#linking"><span class="num">03</span>Linking Your Work</a>
+    <a class="nav-item sub" href="#cross-chain"><span class="num"> </span>↳ Cross-Chain Refs</a>
+    <a class="nav-item sub" href="#attestation"><span class="num"> </span>↳ Attestation</a>
+    <a class="nav-item" href="#identity"><span class="num">04</span>Multi-Chain Identity</a>
+    <a class="nav-item" href="#tags"><span class="num">05</span>Tags &amp; Discovery</a>
+    <a class="nav-item" href="#metadata"><span class="num">06</span>Metadata &amp; Traits</a>
+
+    <div class="nav-group-label">Advanced</div>
+    <a class="nav-item" href="#verification"><span class="num">07</span>Verification &amp; Trust</a>
+    <a class="nav-item" href="#curated"><span class="num">08</span>Curated Collections</a>
+    <a class="nav-item" href="#collabs"><span class="num">09</span>Collaborations</a>
+    <a class="nav-item" href="#workflows"><span class="num">10</span>Workflows</a>
+
+    <div class="nav-group-label">Reference</div>
+    <a class="nav-item" href="#quickref"><span class="num">—</span>Quick Reference</a>
+    <a class="nav-item" href="#glossary"><span class="num">—</span>Glossary</a>
+  </div>
+
+  <div id="mob-drawer-footer">
+    <button id="mob-drawer-theme-btn">
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      <span id="mob-drawer-theme-label">Light mode</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <!-- Claude's simplified logomark -->
+        <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 1.5C3.96 1.5 1.5 3.96 1.5 7s2.46 5.5 5.5 5.5 5.5-2.46 5.5-5.5S10.04 1.5 7 1.5zM7 11a4 4 0 110-8 4 4 0 010 8z" fill="white" opacity="0.9"/>
+          <circle cx="7" cy="7" r="1.8" fill="white"/>
+        </svg>
+      </div>
+      <span class="logo-wordmark">ACME Cortex</span>
+    </div>
+    <div class="sidebar-doc-label">Creator's Guide</div>
+    <div class="sidebar-doc-title">On-chain metadata &amp; relationships</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a class="nav-item active" href="#intro"><span class="num">—</span>What is Cortex?</a>
+    <a class="nav-item" href="#building-blocks"><span class="num">—</span>Building Blocks</a>
+
+    <div class="nav-group-label">Core Features</div>
+    <a class="nav-item" href="#profiles"><span class="num">01</span>Artist Profiles</a>
+    <a class="nav-item" href="#collections"><span class="num">02</span>Collections</a>
+    <a class="nav-item" href="#linking"><span class="num">03</span>Linking Your Work</a>
+    <a class="nav-item sub" href="#cross-chain">↳ Cross-Chain Refs</a>
+    <a class="nav-item sub" href="#attestation">↳ Attestation</a>
+    <a class="nav-item" href="#identity"><span class="num">04</span>Multi-Chain Identity</a>
+    <a class="nav-item" href="#tags"><span class="num">05</span>Tags &amp; Discovery</a>
+    <a class="nav-item" href="#metadata"><span class="num">06</span>Metadata &amp; Traits</a>
+
+    <div class="nav-group-label">Advanced</div>
+    <a class="nav-item" href="#verification"><span class="num">07</span>Verification &amp; Trust</a>
+    <a class="nav-item" href="#curated"><span class="num">08</span>Curated Collections</a>
+    <a class="nav-item" href="#collabs"><span class="num">09</span>Collaborations</a>
+    <a class="nav-item" href="#workflows"><span class="num">10</span>Workflows</a>
+
+    <div class="nav-group-label">Reference</div>
+    <a class="nav-item" href="#quickref"><span class="num">—</span>Quick Reference</a>
+    <a class="nav-item" href="#glossary"><span class="num">—</span>Glossary</a>
+  </div>
+
+  <button id="sidebar-theme-btn" aria-label="Toggle dark mode">
+    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+    <span id="sidebar-theme-label">Light mode</span>
+  </button>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<main class="main">
+
+<!-- HERO -->
+<section id="intro">
+  <div class="hero">
+    <div class="hero-breadcrumb">
+      ACME <span>/</span> Documentation <span>/</span> Cortex
+    </div>
+    <div class="hero-badge">Creator's Guide</div>
+    <h1>ACME <em>Cortex</em></h1>
+    <p class="hero-desc">Turn your assets into a connected universe. Cortex is ACME's on-chain metadata and relationship system — the connective tissue between your art, your identity, and your collections.</p>
+  </div>
+
+  <div class="hero-visual">
+    <img src="https://github.com/SockIts/ACMEProtocol/blob/main/assets/ACME%20Cortex.jpg?raw=true" alt="ACME Cortex — the visual relationship graph showing all connected assets across your network" style="width:100%;display:block;object-fit:cover;max-height:320px;border-top:1px solid var(--border);">
+  </div>
+</section>
+
+<!-- BUILDING BLOCKS -->
+<section class="section" id="building-blocks">
+  <div class="section-inner">
+    <div class="part-eyebrow">Concepts</div>
+    <h2>The Building Blocks</h2>
+    <p class="lead">Every asset on ACME is a standalone piece of data. Cortex lets you <strong>connect</strong> those pieces — permanently and verifiably on-chain, embedded directly in your Bitcoin transactions.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-dir">→ outgoing link</div>
+        <div class="concept-name">Axon</div>
+        <p class="concept-desc">A relationship you declare from your asset to another. <em>"This artwork is by this artist."</em></p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-dir">← incoming link</div>
+        <div class="concept-name">Dendrite</div>
+        <p class="concept-desc">An incoming reference from someone else's asset to yours. <em>"12 artworks all point to my profile."</em></p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-dir"># label</div>
+        <div class="concept-name">Tag</div>
+        <p class="concept-desc">A label on your asset for categorization and discovery. Like <code>#pixelart</code> or <code>#limited-edition</code>.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-dir">⇌ mutual</div>
+        <div class="concept-name">Synapse</div>
+        <p class="concept-desc">A confirmed two-way relationship — a verified handshake where both sides independently agree.</p>
+      </div>
+    </div>
+
+    <img src="https://github.com/SockIts/ACMEProtocol/blob/main/assets/Cortex.png?raw=true" alt="Artist profile page showing bio, linked artworks grid, and verification badges" style="width:100%;border-radius:var(--radius-lg);border:1px solid var(--border);display:block;margin:20px 0;">
+    <div class="callout info">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <strong>Why on-chain?</strong>
+        <p>Cortex connections aren't database labels. They're embedded in Bitcoin transactions — permanent, verifiable, and controlled by no one but you.</p>
+      </div>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#profiles">Part 01: Artist Profiles <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- PROFILES -->
+<section class="section" id="profiles">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 01</div>
+    <h2>Artist Profiles</h2>
+    <p class="lead">A <strong>profile</strong> is a special asset that represents <em>you</em> — the creator. Other assets reference your profile to establish authorship and build your on-chain portfolio.</p>
+
+    <img src="https://github.com/SockIts/ACMEProtocol/blob/main/assets/Profile.png?raw=true" alt="Artist profile page showing bio, linked artworks grid, and verification badges" style="width:100%;border-radius:var(--radius-lg);border:1px solid var(--border);display:block;margin:20px 0;">
+
+    <h3>Creating a Profile</h3>
+    <p>Go to <strong>Create → Profile</strong> and complete these steps.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Choose your Asset Name</strong>
+          <p>Your permanent on-chain handle — 3–16 uppercase characters. Examples: <code>ALICE</code>, <code>PIXELKING</code>, <code>MORT</code>. This cannot be changed later.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Write your Bio and add Social Links</strong>
+          <p>Up to 500 characters. Add Twitter, Discord, website, or any other URL.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Upload your Profile Image</strong>
+          <p>Your avatar or logo. Choose a storage tier based on file size and permanence needs.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Set fee and sign</strong>
+          <p>Once confirmed on-chain, your profile is live and every artwork you link builds your portfolio automatically.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Storage Tiers</h3>
+    <div class="tier-grid">
+      <div class="tier-card">
+        <div class="tier-name">OLGA</div>
+        <div class="tier-size">≤ 63 KB</div>
+        <p class="tier-desc">ACME's native UTXO encoding. Art data spread across multiple transaction outputs.</p>
+      </div>
+      <div class="tier-card">
+        <div class="tier-name">OP_RETURN</div>
+        <div class="tier-size">≤ 100 KB</div>
+        <p class="tier-desc">Stored in OP_RETURN outputs. No dust outputs required.</p>
+      </div>
+      <div class="tier-card">
+        <div class="tier-name">Witness</div>
+        <div class="tier-size">≤ 399 KB</div>
+        <p class="tier-desc">Taproot witness script. Largest on-chain capacity available.</p>
+      </div>
+      <div class="tier-card">
+        <div class="tier-name">Arweave</div>
+        <div class="tier-size">No limit</div>
+        <p class="tier-desc">Permanent decentralized storage. Best for high-res art and animation.</p>
+      </div>
+    </div>
+
+    <h3>Why Profiles Matter</h3>
+    <div class="callout tip"><div class="callout-icon">🎨</div><div class="callout-body"><strong>Portfolio Discovery</strong><p>Anyone browsing your profile sees all your linked works in one place.</p></div></div>
+    <div class="callout tip"><div class="callout-icon">✅</div><div class="callout-body"><strong>Automatic Verification</strong><p>Issue both your profile and artwork from the same address — ACME auto-connects them with a green verified badge. No extra steps.</p></div></div>
+    <div class="callout tip"><div class="callout-icon">🌐</div><div class="callout-body"><strong>Cross-Chain Identity</strong><p>Bind additional blockchain addresses to prove you're the same person across chains.</p></div></div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#collections">Part 02: Collections <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTIONS -->
+<section class="section" id="collections">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 02</div>
+    <h2>Collections</h2>
+    <p class="lead">A <strong>collection</strong> groups related assets together — a series, a themed drop, a curated gallery. Collections are full on-chain assets with their own metadata and verification.</p>
+
+    <h3>Creating a Collection</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Go to Create → Collection</strong><p>Fill in Asset Name (e.g. <code>SUMMERSERIES</code>), Title, Description, Cover Image, and optionally link your artist profile as Curator.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Sign and broadcast</strong><p>Your collection is now a live, permanent asset on-chain.</p></div></div>
+    </div>
+
+    <h3>Adding Items</h3>
+    <div class="callout info"><div class="callout-icon">🪙</div><div class="callout-body"><strong>At mint time (easiest)</strong><p>When creating a new artwork, add a <code>collection</code> relationship. It's embedded permanently in the reveal transaction.</p></div></div>
+    <div class="callout info"><div class="callout-icon">🔗</div><div class="callout-body"><strong>After creation</strong><p>Go to <strong>Manage Asset</strong> on any artwork you own and add a <code>collection</code> relationship via a Cortex Update transaction.</p></div></div>
+
+    <img src="https://github.com/SockIts/ACMEProtocol/blob/main/assets/Collection.png?raw=true" alt="Collection page showing the item grid with verification badges and dendrite list" style="width:100%;border-radius:var(--radius-lg);border:1px solid var(--border);display:block;margin:20px 0;">
+
+    <h3>How Membership Works</h3>
+    <p>When your artwork declares <code>collection: MYSERIES</code>, two things happen automatically:</p>
+    <div class="flow">
+      <div><span class="flow-node">Your Artwork</span> <span class="flow-arrow">──</span> <span class="flow-rel">[collection]</span> <span class="flow-arrow">──→</span> <span class="flow-node">MYSERIES</span> <span class="flow-comment" style="margin-left:10px;">← axon (outgoing)</span></div>
+      <div style="margin-top:2px;"><span class="flow-node">MYSERIES</span> <span class="flow-arrow">────── receives ────→</span> <span class="flow-node">Your Artwork</span> <span class="flow-comment" style="margin-left:10px;">← dendrite (incoming)</span></div>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#linking">Part 03: Linking Your Work <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- LINKING -->
+<section class="section" id="linking">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 03</div>
+    <h2>Linking Your Work</h2>
+    <p class="lead">Relationships describe the nature of the connection between assets. Choose from built-in types, or define custom relationship names for your specific needs.</p>
+
+    <h3>Relationship Types</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>Use For</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><code>artist</code></td><td>Crediting the creator</td><td>This piece was made by ALICE</td></tr>
+          <tr><td><code>collection</code></td><td>Grouping into a series</td><td>This belongs to SUMMERSERIES</td></tr>
+          <tr><td><code>derivative</code></td><td>Remixes or adaptations</td><td>Derived from ORIGINAL.WORK</td></tr>
+          <tr><td><code>source</code></td><td>Citing inspiration</td><td>Inspired by CLASSIC.PIECE</td></tr>
+          <tr><td><code>version</code></td><td>Updated editions</td><td>v2 of DRAFT.ONE</td></tr>
+          <tr><td><code>reply</code></td><td>Artistic responses</td><td>A response to CHALLENGE.01</td></tr>
+          <tr><td><code>license</code></td><td>License references</td><td>Licensed under CC-BY</td></tr>
+          <tr><td><code>link</code></td><td>General-purpose</td><td>Any other connection</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout tip"><div class="callout-icon">✏️</div><div class="callout-body"><strong>Custom Relationship Types</strong><p>Create any type using lowercase letters, numbers, and hyphens — e.g., <code>tribute</code>, <code>commissioned-by</code>.</p></div></div>
+
+    <img src="https://github.com/SockIts/ACMEProtocol/blob/main/assets/Assets%20Create.png?raw=true" alt="Easy Create form with the Relationships section expanded" style="width:100%;border-radius:var(--radius-lg);border:1px solid var(--border);display:block;margin:20px 0;">
+
+    <h3>Adding Relationships at Mint Time</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Open Easy Create</strong><p>Expand the <strong>Relationships</strong> section in the creation form.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Click Add Relationship</strong><p>Choose the type and enter the target — an ACME asset name or a cross-chain reference.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Add more as needed</strong><p>All relationships embed permanently in your reveal transaction.</p></div></div>
+    </div>
+
+    <h3>Adding Relationships After Minting</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Go to your asset's page and click Manage</strong><p>Only visible to the asset's issuer.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Under Relationships, click Add</strong><p>Choose type, enter target, confirm.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Sign the Cortex Update transaction</strong><p>Processed in the next block. Every change is permanently on-chain in your asset's audit trail.</p></div></div>
+    </div>
+
+    <h3 id="cross-chain">Cross-Chain References</h3>
+    <p>Reference assets on other blockchains using URI prefixes.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Chain</th><th>Format</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Bitcoin Ordinals</td><td><code>/o/{inscription_id}</code></td><td><code>/o/abc123def456i0</code></td></tr>
+          <tr><td>Bitcoin Stamps</td><td><code>/s/{stamp_id}</code></td><td><code>/s/A12345</code></td></tr>
+          <tr><td>Arweave</td><td><code>/a/{tx_id}</code></td><td><code>/a/BNttzE8a...</code></td></tr>
+          <tr><td>IPFS</td><td><code>/ipfs/{cid}</code></td><td><code>/ipfs/QmXyz123...</code></td></tr>
+          <tr><td>Ethereum NFTs</td><td><code>/eth/{contract}/{token}</code></td><td><code>/eth/0xBC4C.../42</code></td></tr>
+          <tr><td>Solana NFTs</td><td><code>/sol/{address}</code></td><td><code>/sol/7xKXtg2CW87d...</code></td></tr>
+          <tr><td>Tezos</td><td><code>/tez/{contract}/{token}</code></td><td><code>/tez/KT1.../42</code></td></tr>
+          <tr><td>Base</td><td><code>/base/{contract}/{token}</code></td><td><code>/base/0xABC.../7</code></td></tr>
+          <tr><td>Polygon</td><td><code>/polygon/{contract}/{token}</code></td><td><code>/polygon/0xDEF.../1</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn"><div class="callout-icon">⚠️</div><div class="callout-body"><strong>Cross-chain links show yellow or gray</strong><p>The foreign chain can't create a matching axon back to ACME. Use Cross-Chain Attestation (below) to upgrade the badge to blue.</p></div></div>
+
+    <h3 id="attestation">Cross-Chain Attestation</h3>
+    <p>An <strong>attestation</strong> is a formal on-chain claim about a foreign asset, optionally backed by cryptographic proof.</p>
+
+    <h4>Claim Types</h4>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Claim</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Ownership</strong></td><td>You own this foreign asset — e.g., you hold a Bored Ape and want to link it to your ACME profile</td></tr>
+          <tr><td><strong>Authorship</strong></td><td>You created this foreign asset — e.g., you minted an Ordinal inscription and want to connect it to your ACME artist profile</td></tr>
+          <tr><td><strong>Same</strong></td><td>This foreign asset IS the same work as this ACME asset — the same artwork published on two chains</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Proof Levels</h4>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-dir"><span class="badge gray"><span class="badge-dot"></span>gray — Self-Attested</span></div>
+        <div class="concept-name">No proof required</div>
+        <p class="concept-desc">Declare the claim with no cryptographic proof. Results in <code>crosschain_claimed</code> status — easiest but least trusted.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-dir"><span class="badge blue"><span class="badge-dot"></span>blue — Cryptographic</span></div>
+        <div class="concept-name">Signed message</div>
+        <p class="concept-desc">Sign a message from the foreign address. Results in <code>crosschain_attested</code> — a much stronger trust signal.</p>
+      </div>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#identity">Part 04: Multi-Chain Identity <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- IDENTITY -->
+<section class="section" id="identity">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 04</div>
+    <h2>Multi-Chain Identity</h2>
+    <p class="lead">Your profile's primary address is auto-linked. If you're active on multiple chains, <strong>bind additional addresses</strong> to prove they all belong to you — building a unified on-chain identity.</p>
+
+    <h3>Supported Chains</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Chain</th><th>Address Format</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Bitcoin</strong></td><td><code>bc1q...</code> · <code>bc1p...</code> · <code>1...</code> · <code>3...</code></td></tr>
+          <tr><td><strong>Ethereum</strong></td><td><code>0x...</code> (40 hex chars)</td></tr>
+          <tr><td><strong>Tezos</strong></td><td><code>tz1...</code> · <code>tz2...</code> · <code>tz3...</code></td></tr>
+          <tr><td><strong>Solana</strong></td><td>Base58 address</td></tr>
+          <tr><td><strong>Base &amp; Polygon</strong></td><td><code>0x...</code> (same as Ethereum)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>How to Bind an Address</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Sign a message from your foreign wallet</strong><p>Format: <code>ACME:BIND:MYPROFILE:&lt;timestamp&gt;</code></p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Submit a ProfileBind transaction</strong><p>Include your profile name, target chain, foreign address, and the signed message + signature.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Done</strong><p>Result: <span class="badge green"><span class="badge-dot"></span>address_verified</span>. You can also self-attest — the address binds but shows <span class="badge yellow"><span class="badge-dot"></span>self_claimed</span>.</p></div></div>
+    </div>
+
+    <h3>Why Bind Addresses?</h3>
+    <div class="callout tip"><div class="callout-icon">🗂️</div><div class="callout-body"><strong>Unified portfolio</strong><p>Collectors visiting your ACME profile see your work across all chains.</p></div></div>
+    <div class="callout tip"><div class="callout-icon">🔐</div><div class="callout-body"><strong>Stronger verification</strong><p>When your bound address matches an NFT you reference, ACME verifies the link automatically.</p></div></div>
+    <div class="callout tip"><div class="callout-icon">🔍</div><div class="callout-body"><strong>Cross-chain discovery</strong><p>Other users searching your Ethereum or Solana address find your ACME profile.</p></div></div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#tags">Part 05: Tags &amp; Discovery <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- TAGS -->
+<section class="section" id="tags">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 05</div>
+    <h2>Tags &amp; Discovery</h2>
+    <p class="lead">Tags are on-chain labels for categorization and discoverability — permanently embedded in your asset's transaction, searchable and combinable in the explorer.</p>
+
+    <h4>Classification — What type of asset is this?</h4>
+    <div class="tag-group">
+      <span class="tag-chip">artwork</span><span class="tag-chip">profile</span><span class="tag-chip">collection</span><span class="tag-chip">music</span><span class="tag-chip">video</span><span class="tag-chip">3d</span><span class="tag-chip">game-asset</span><span class="tag-chip">document</span><span class="tag-chip">certificate</span><span class="tag-chip">ticket</span><span class="tag-chip">membership</span>
+    </div>
+
+    <h4>Content — How was it made?</h4>
+    <div class="tag-group">
+      <span class="tag-chip">ai-generated</span><span class="tag-chip">animated</span><span class="tag-chip">interactive</span><span class="tag-chip">generative</span><span class="tag-chip">nsfw</span>
+    </div>
+
+    <h4>Significance — What makes it special?</h4>
+    <div class="tag-group">
+      <span class="tag-chip">genesis</span><span class="tag-chip">verified</span><span class="tag-chip">featured</span><span class="tag-chip">limited</span><span class="tag-chip">one-of-one</span><span class="tag-chip">open-edition</span>
+    </div>
+
+    <h4>Rights — What can people do with it?</h4>
+    <div class="tag-group">
+      <span class="tag-chip">cc0</span><span class="tag-chip">cc-by</span><span class="tag-chip">cc-by-nc</span><span class="tag-chip">rights-reserved</span><span class="tag-chip">commercial-ok</span>
+    </div>
+
+    <h4>Technical — Special behaviors</h4>
+    <div class="tag-group">
+      <span class="tag-chip">soulbound</span><span class="tag-chip">burnable</span><span class="tag-chip">upgradeable</span><span class="tag-chip">reveal-pending</span>
+    </div>
+
+    <h3>Custom Tags</h3>
+    <p>Beyond system tags, create any tag using lowercase letters, numbers, and hyphens:</p>
+    <div class="tag-group">
+      <span class="tag-chip">pixelart</span><span class="tag-chip">vaporwave</span><span class="tag-chip">portrait</span><span class="tag-chip">abstract</span><span class="tag-chip">bitcoin-art</span><span class="tag-chip">hand-drawn</span>
+    </div>
+
+    <img src="https://github.com/SockIts/ACMEProtocol/blob/main/assets/Tags.png?raw=true" alt="Explorer tag browse page showing trending tags and filtered gallery view" style="width:100%;border-radius:var(--radius-lg);border:1px solid var(--border);display:block;margin:20px 0;">
+
+    <div class="section-footer">
+      <a class="next-btn" href="#metadata">Part 06: Metadata &amp; Traits <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- METADATA -->
+<section class="section" id="metadata">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 06</div>
+    <h2>Metadata &amp; Traits</h2>
+    <p class="lead">Every asset carries rich metadata — making it discoverable, collectible, and filterable by trait across the entire ACME marketplace.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>What It Does</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Name</strong></td><td>Display title</td><td>"Sunset Over Bitcoin City"</td></tr>
+          <tr><td><strong>Description</strong></td><td>Longer explanation (up to 3,000 chars)</td><td>"A generative piece exploring..."</td></tr>
+          <tr><td><strong>Image</strong></td><td>Preview / thumbnail</td><td>Auto-set from your art content</td></tr>
+          <tr><td><strong>Attributes</strong></td><td>Structured traits (key-value pairs)</td><td>Rarity: Legendary, Color: Blue</td></tr>
+          <tr><td><strong>Social Links</strong></td><td>Online presence</td><td>Twitter, Discord, Website</td></tr>
+          <tr><td><strong>Provenance</strong></td><td>Creation context</td><td>Date created, license, tools used</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Attributes (Traits)</h3>
+    <p>Attributes work like NFT traits — structured key-value pairs that collectors can filter by. Up to 50 per asset.</p>
+    <pre>Background: Night Sky
+Palette:    Neon
+Rarity:     1 of 1
+Medium:     Digital Oil</pre>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#verification">Part 07: Verification &amp; Trust <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- VERIFICATION -->
+<section class="section" id="verification">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 07</div>
+    <h2>Verification &amp; Trust</h2>
+    <p class="lead">When you connect two assets, ACME evaluates the trust level and shows a colored badge — giving collectors an instant read on how well-established each relationship is.</p>
+
+    <div class="verify-grid">
+      <div class="verify-card is-green">
+        <span class="badge green"><span class="badge-dot"></span>green — Issuer Verified</span>
+        <div class="verify-title">Same-Address Proof</div>
+        <p class="verify-desc">Both assets issued from the same Bitcoin address. ACME auto-verifies — no extra steps needed.</p>
+      </div>
+      <div class="verify-card is-green">
+        <span class="badge green"><span class="badge-dot"></span>green — Synapse Verified</span>
+        <div class="verify-title">Mutual Agreement</div>
+        <p class="verify-desc">Both sides independently created matching relationships toward each other.</p>
+      </div>
+      <div class="verify-card is-yellow">
+        <span class="badge yellow"><span class="badge-dot"></span>yellow — Pending</span>
+        <div class="verify-title">One-Sided Claim</div>
+        <p class="verify-desc">Only one asset has declared the relationship so far. Normal until the other side confirms.</p>
+      </div>
+      <div class="verify-card is-blue">
+        <span class="badge blue"><span class="badge-dot"></span>blue / gray — Cross-Chain</span>
+        <div class="verify-title">Foreign Reference</div>
+        <p class="verify-desc">Blue = cryptographic proof. Gray = self-attested only. The foreign chain can't auto-confirm.</p>
+      </div>
+    </div>
+
+    <img src="https://github.com/SockIts/ACMEProtocol/blob/main/assets/Asset%20Detail%20Page.png?raw=true" alt="Asset detail page showing the Relationships panel with verification badges" style="width:100%;border-radius:var(--radius-lg);border:1px solid var(--border);display:block;margin:20px 0;">
+
+    <h3>The Easiest Path to a Green Badge</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Create your profile from address X</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Create your artwork from the same address X</strong></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Add an <code>artist</code> relationship pointing to your profile</strong></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Done — auto-verified ✓</strong><p>ACME sees the same issuer on both sides. Same logic applies to collections.</p></div></div>
+    </div>
+
+    <h3>Synapses — Two-Way Confirmation</h3>
+    <p>A <strong>synapse</strong> forms when both sides of a relationship independently agree — most relevant when different creators collaborate from different addresses.</p>
+    <div class="flow">
+      <div><span class="flow-node">Your Artwork</span> <span class="flow-arrow">──</span> <span class="flow-rel">[artist]</span> <span class="flow-arrow">──→</span> <span class="flow-node">Alice's Profile</span> <span class="badge yellow" style="margin-left:8px;font-size:11px;"><span class="badge-dot"></span>pending</span></div>
+      <div style="margin-top:3px;"><span class="flow-node">Alice's Profile</span> <span class="flow-arrow">──</span> <span class="flow-rel">[work]</span> <span class="flow-arrow">──→</span> <span class="flow-node">Your Artwork</span> <span class="badge green" style="margin-left:8px;font-size:11px;"><span class="badge-dot"></span>synapsed</span></div>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#curated">Part 08: Curated Collections <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- CURATED -->
+<section class="section" id="curated">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 08</div>
+    <h2>Curated Collections</h2>
+    <p class="lead">Collections support a <strong>submit → review → approve</strong> workflow, entirely on-chain. The synapse system acts as the approval mechanism — no off-chain coordination required.</p>
+
+    <img src="https://github.com/SockIts/ACMEProtocol/blob/main/assets/Collection%20Pending.png?raw=true" alt="Curator workflow: artist submits, curator reviews dendrites and approves with item axon" style="width:100%;border-radius:var(--radius-lg);border:1px solid var(--border);display:block;margin:20px 0;">
+
+    <h3>Multi-Contributor Submission Flow</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Step</th><th>Who</th><th>Action</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Artist</td><td>Adds <code>collection → BTCART2026</code> to their artwork</td><td><span class="badge yellow"><span class="badge-dot"></span>pending</span></td></tr>
+          <tr><td>2</td><td>Curator</td><td>Sees the incoming dendrite on the collection's Manage page</td><td>—</td></tr>
+          <tr><td>3</td><td>Curator</td><td>Creates <code>item → ARTWORK</code> from the collection</td><td><span class="badge green"><span class="badge-dot"></span>synapsed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout info"><div class="callout-icon">ℹ️</div><div class="callout-body"><strong>Rejecting a submission</strong><p>There's no explicit reject. If the curator doesn't create the reverse <code>item</code> axon, the relationship stays yellow. The absence of the green badge is the signal.</p></div></div>
+
+    <h3>Other Collection Types</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>Forward</th><th>Inverse</th><th>Use Case</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Permanent Collection</strong></td><td><code>collection</code></td><td><code>item</code></td><td>Ongoing, permanent groupings</td></tr>
+          <tr><td><strong>Exhibition</strong></td><td><code>exhibition</code></td><td><code>exhibit</code></td><td>Time-bounded shows or events</td></tr>
+          <tr><td><strong>Series</strong></td><td><code>series</code></td><td><code>entry</code></td><td>Sequential or numbered releases</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#collabs">Part 09: Collaborations <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- COLLABS -->
+<section class="section" id="collabs">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 09</div>
+    <h2>Collaborations</h2>
+    <p class="lead">Cortex has purpose-built relationship types for multi-artist work — guest credits, commissions, remixes, and endorsements, all verified on-chain.</p>
+
+    <h3>Attribution Patterns</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Scenario</th><th>Relationships Used</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Solo attribution</strong></td><td><code>artist</code> → your profile (auto-verified, same issuer)</td></tr>
+          <tr><td><strong>Guest artist</strong></td><td><code>artist</code> → guest profile; guest confirms with <code>work</code> → piece</td></tr>
+          <tr><td><strong>Multiple contributors</strong></td><td><code>artist</code> + <code>collaborator</code> → each contributor's profile</td></tr>
+          <tr><td><strong>Commission record</strong></td><td><code>commissioner</code> → patron; patron confirms with <code>commissioned</code></td></tr>
+          <tr><td><strong>Derivative / remix</strong></td><td><code>derivative</code> → original; original may confirm with <code>spawned</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn"><div class="callout-icon">🔒</div><div class="callout-body"><strong>Ownership-Validated Relationships</strong><p><code>artist</code>, <code>collaborator</code>, <code>collection</code>, and <code>series</code> require you to own the target asset — preventing false credits. If you don't, the target's owner creates the inverse axon to confirm from their side.</p></div></div>
+
+    <h3>Real-World Example: Collaborative Drop</h3>
+    <pre><span class="c">// Alice: same address as collection — auto-verified</span>
+ALICE.PIECE ──[artist]──→ ALICE           <span class="g">● green ✓ (issuer)</span>
+ALICE.PIECE ──[collection]──→ ARTDROP2026 <span class="g">● green ✓ (issuer)</span>
+
+<span class="c">// Bob: different address — needs curator approval</span>
+BOB.PIECE ──[artist]──→ BOB               <span class="g">● green ✓ (issuer)</span>
+BOB.PIECE ──[collection]──→ ARTDROP2026   <span class="y">● yellow (pending)</span>
+
+<span class="c">// Alice approves by creating the reverse axon</span>
+ARTDROP2026 ──[item]──→ BOB.PIECE         <span class="g">→ synapse formed ✓ green</span></pre>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#workflows">Part 10: Workflows <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOWS -->
+<section class="section" id="workflows">
+  <div class="section-inner">
+    <div class="part-eyebrow">Part 10</div>
+    <h2>Putting It All Together</h2>
+    <p class="lead">Two recommended setups depending on your role, plus a complete relationship pair reference for advanced use.</p>
+
+    <h3>Recommended Setup: Solo Artist</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Create your profile</strong><p>Your on-chain identity — the foundation for everything.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Create collections</strong><p>One per series or theme.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>When minting artwork, add relationships</strong><p><code>artist</code> → your profile · <code>collection</code> → relevant collection.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Tag everything</strong><p>At minimum: <code>artwork</code> + content-specific tags.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Add attributes</strong><p>Traits that make each piece unique and searchable by collectors.</p></div></div>
+    </div>
+
+    <div class="callout tip"><div class="callout-icon">✨</div><div class="callout-body"><strong>Solo artist tip</strong><p>Issue everything from the same address — all <code>artist</code> and <code>collection</code> links auto-verify with green badges. No extra steps needed.</p></div></div>
+
+    <h3>Recommended Setup: Curator</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Create your curator profile</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Create collections</strong><p>One per exhibition, series, or theme.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Announce</strong><p>Share the collection asset name with artists you want to invite.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Monitor dendrites</strong><p>Watch for incoming submissions on the collection's Manage page.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Approve by synapsing</strong><p>Create <code>item</code> axons back to works you accept.</p></div></div>
+    </div>
+
+    <h3>Relationship Pairs Reference</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Forward (you declare)</th><th>Inverse (they confirm)</th><th>Use Case</th></tr></thead>
+        <tbody>
+          <tr><td><code>artist</code></td><td><code>work</code></td><td>Attribution</td></tr>
+          <tr><td><code>collaborator</code></td><td><code>collaboration</code></td><td>Multi-artist credit</td></tr>
+          <tr><td><code>curator</code></td><td><code>curated</code></td><td>Curation credit</td></tr>
+          <tr><td><code>commissioner</code></td><td><code>commissioned</code></td><td>Commission record</td></tr>
+          <tr><td><code>collection</code></td><td><code>item</code></td><td>Collection membership</td></tr>
+          <tr><td><code>series</code></td><td><code>entry</code></td><td>Sequential grouping</td></tr>
+          <tr><td><code>exhibition</code></td><td><code>exhibit</code></td><td>Temporary showcase</td></tr>
+          <tr><td><code>derivative</code></td><td><code>spawned</code></td><td>Remix / adaptation</td></tr>
+          <tr><td><code>source</code></td><td><code>used-by</code></td><td>Inspiration credit</td></tr>
+          <tr><td><code>endorsement</code></td><td><code>endorsed-by</code></td><td>Social proof</td></tr>
+          <tr><td><code>version</code></td><td><code>successor</code></td><td>Version chain</td></tr>
+          <tr><td><code>parent</code></td><td><code>child</code></td><td>Hierarchy</td></tr>
+          <tr><td><code>reply</code></td><td><code>thread</code></td><td>Conversation</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout info"><div class="callout-icon">🔄</div><div class="callout-body"><strong>Cortex Updates</strong><p>Add or remove tags and relationships at any time. Each change creates a Cortex Update transaction (up to <strong>50 operations per transaction</strong>), permanently recorded on-chain in your asset's audit trail.</p></div></div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#quickref">Quick Reference <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- QUICK REFERENCE -->
+<section class="section" id="quickref">
+  <div class="section-inner">
+    <div class="part-eyebrow">Reference</div>
+    <h2>Quick Reference</h2>
+
+    <h3>Limits at a Glance</h3>
+    <div class="limits-grid">
+      <div class="limit-item"><span class="limit-val">50</span><span class="limit-label">Tags per asset</span></div>
+      <div class="limit-item"><span class="limit-val">100</span><span class="limit-label">Relationships per asset</span></div>
+      <div class="limit-item"><span class="limit-val">50</span><span class="limit-label">Ops per update tx</span></div>
+      <div class="limit-item"><span class="limit-val">3–16</span><span class="limit-label">Asset name length</span></div>
+      <div class="limit-item"><span class="limit-val">3,000</span><span class="limit-label">Description chars</span></div>
+      <div class="limit-item"><span class="limit-val">399 KB</span><span class="limit-label">Max art (Witness)</span></div>
+    </div>
+
+    <h3>Content Storage Options</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tier</th><th>Where It Lives</th><th>Max Size</th><th>Best For</th></tr></thead>
+        <tbody>
+          <tr><td><strong>OLGA</strong></td><td>ACME native UTXO encoding</td><td>63 KB</td><td>Small images, ACME-native</td></tr>
+          <tr><td><strong>OP_RETURN</strong></td><td>Bitcoin OP_RETURN outputs</td><td>100 KB</td><td>No dust outputs needed</td></tr>
+          <tr><td><strong>Witness</strong></td><td>Taproot witness script</td><td>399 KB</td><td>Largest on-chain capacity</td></tr>
+          <tr><td><strong>Arweave</strong></td><td>Decentralized permanent storage</td><td>No limit</td><td>High-res, archival, animation</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Key Pages in the App</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Page</th><th>What You Do There</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Create → Easy Create</strong></td><td>Mint artwork with metadata, tags, and relationships</td></tr>
+          <tr><td><strong>Create → Profile</strong></td><td>Create your artist identity</td></tr>
+          <tr><td><strong>Create → Collection</strong></td><td>Create a collection to group works</td></tr>
+          <tr><td><strong>Explorer → Asset Detail</strong></td><td>View any asset's full metadata, relationships, and verification</td></tr>
+          <tr><td><strong>Explorer → Cortex Universe</strong></td><td>Visual graph of the entire relationship network</td></tr>
+          <tr><td><strong>Profile → Manage Asset</strong></td><td>Edit tags and relationships on your own assets</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-footer">
+      <a class="next-btn" href="#glossary">Glossary <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- GLOSSARY -->
+<section class="section" id="glossary">
+  <div class="section-inner">
+    <div class="part-eyebrow">Reference</div>
+    <h2>Glossary</h2>
+    <p style="margin-bottom:28px;">Key terms used throughout this guide.</p>
+
+    <div class="glossary-item"><div class="glossary-term">Axon</div><div class="glossary-def">An outgoing relationship you declare from your asset to another target asset.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Dendrite</div><div class="glossary-def">An incoming relationship — someone else's asset points to yours. Visible on your asset's detail page.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Synapse</div><div class="glossary-def">A confirmed two-way relationship where both sides independently created matching axons toward each other.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Inverse Pair</div><div class="glossary-def">Matching forward/reverse relationship types — e.g., <code>collection</code>↔<code>item</code> — that form a synapse when both exist.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Cortex Update</div><div class="glossary-def">A transaction that modifies tags or relationships after minting. Up to 50 operations per transaction.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Issuer</div><div class="glossary-def">The Bitcoin address that created (issued) an asset. Controls the Manage page and relationship editing rights.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Issuer Verified</div><div class="glossary-def"><span class="badge green" style="margin-right:8px;"><span class="badge-dot"></span>green</span>Both assets were issued from the same Bitcoin address.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Synapse Verified</div><div class="glossary-def"><span class="badge green" style="margin-right:8px;"><span class="badge-dot"></span>green</span>Both sides created matching axons toward each other — a mutual on-chain handshake.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Pending</div><div class="glossary-def"><span class="badge yellow" style="margin-right:8px;"><span class="badge-dot"></span>yellow</span>Only one side has declared the relationship. Normal until the other side confirms.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Tag</div><div class="glossary-def">An on-chain label for categorization and discovery. Up to 50 per asset.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Attribute</div><div class="glossary-def">A structured trait (key-value pair) — searchable and filterable by collectors. Up to 50 per asset.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Cross-Chain Ref</div><div class="glossary-def">A relationship pointing to an asset on another blockchain using a URI prefix like <code>/o/</code> or <code>/eth/</code>.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Profile</div><div class="glossary-def">A special asset type representing a creator identity. Other assets reference it to claim authorship.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Collection</div><div class="glossary-def">A special asset type representing a curated group of works, with its own cover image and metadata.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Curator</div><div class="glossary-def">The creator/owner of a collection who approves submissions by creating <code>item</code> axons, forming synapses.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Ownership Validated</div><div class="glossary-def">Four types (<code>artist</code>, <code>collaborator</code>, <code>collection</code>, <code>series</code>) require you to own the target asset to prevent false credits.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Endorsement</div><div class="glossary-def">A social proof relationship from an established artist to another's work, visible to collectors as a trust signal.</div></div>
+
+    <div style="margin-top:48px;padding-top:22px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:12px;color:var(--text-hint);">ACME Cortex Creator's Guide · v1.0</span>
+      <a href="#intro" style="font-size:12px;color:var(--text-tertiary);text-decoration:none;transition:color 0.12s;" onmouseover="this.style.color='var(--accent-text)'" onmouseout="this.style.color='var(--text-tertiary)'">↑ Back to top</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ─── THEME ───────────────────────────────────────────────────────────────────
+var ROOT = document.documentElement;
+
+var sidebarThemeBtn  = document.getElementById('sidebar-theme-btn');
+var sidebarThemeLbl  = document.getElementById('sidebar-theme-label');
+var mobDrawerThemeBtn = document.getElementById('mob-drawer-theme-btn');
+var mobDrawerThemeLbl = document.getElementById('mob-drawer-theme-label');
+var mobThemeBtn      = document.getElementById('mob-theme-btn');
+var mobSun           = document.getElementById('mob-sun');
+var mobMoon          = document.getElementById('mob-moon');
+
+function setTheme(dark) {
+  ROOT.classList.toggle('dark', dark);
+  var label = dark ? 'Dark mode' : 'Light mode';
+  if (sidebarThemeLbl)   sidebarThemeLbl.textContent  = label;
+  if (mobDrawerThemeLbl) mobDrawerThemeLbl.textContent = label;
+  if (mobSun)  mobSun.style.display  = dark ? 'none'  : 'block';
+  if (mobMoon) mobMoon.style.display = dark ? 'block' : 'none';
+  try { localStorage.setItem('guide-theme', dark ? 'dark' : 'light'); } catch(e) {}
+}
+
+function toggleTheme() { setTheme(!ROOT.classList.contains('dark')); }
+
+if (sidebarThemeBtn)   sidebarThemeBtn.addEventListener('click',   toggleTheme);
+if (mobThemeBtn)       mobThemeBtn.addEventListener('click',       toggleTheme);
+if (mobDrawerThemeBtn) mobDrawerThemeBtn.addEventListener('click', toggleTheme);
+
+// Init from saved pref or OS
+(function() {
+  var saved;
+  try { saved = localStorage.getItem('guide-theme'); } catch(e) {}
+  var osDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(saved === 'dark' || (!saved && osDark));
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    var s; try { s = localStorage.getItem('guide-theme'); } catch(ex) {}
+    if (!s) setTheme(e.matches);
+  });
+})();
+
+// ─── MOBILE DRAWER ───────────────────────────────────────────────────────────
+var mobBar      = document.getElementById('mob-bar');
+var mobOverlay  = document.getElementById('mob-overlay');
+var mobDrawer   = document.getElementById('mob-drawer');
+var mobMenuBtn  = document.getElementById('mob-menu-btn');
+var mobCloseBtn = document.getElementById('mob-close-btn');
+
+var MOBILE_BP = 860;
+var drawerOpen = false;
+
+// Show / hide the top bar based on viewport width
+function syncTopBar() {
+  if (!mobBar) return;
+  mobBar.style.display = window.innerWidth <= MOBILE_BP ? 'flex' : 'none';
+}
+syncTopBar();
+window.addEventListener('resize', syncTopBar);
+
+function openDrawer() {
+  if (!mobDrawer || !mobOverlay) return;
+  drawerOpen = true;
+  mobOverlay.style.display = 'block';
+  mobDrawer.style.display  = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+  if (!mobDrawer || !mobOverlay) return;
+  drawerOpen = false;
+  mobOverlay.style.display = 'none';
+  mobDrawer.style.display  = 'none';
+  document.body.style.overflow = '';
+}
+
+if (mobMenuBtn)  mobMenuBtn.addEventListener('click',  openDrawer);
+if (mobCloseBtn) mobCloseBtn.addEventListener('click', closeDrawer);
+if (mobOverlay)  mobOverlay.addEventListener('click',  closeDrawer);
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && drawerOpen) closeDrawer();
+});
+
+// Close drawer when a nav link is tapped, then navigate
+if (mobDrawer) {
+  mobDrawer.querySelectorAll('a.nav-item').forEach(function(link) {
+    link.addEventListener('click', function() {
+      closeDrawer();
+    });
+  });
+}
+
+// ─── ACTIVE NAV HIGHLIGHT ────────────────────────────────────────────────────
+var allNavLinks = document.querySelectorAll('.nav-item[href^="#"]');
+var allSections = [];
+allNavLinks.forEach(function(l) {
+  var id = l.getAttribute('href').slice(1);
+  var el = document.getElementById(id);
+  if (el) allSections.push(el);
+});
+
+function setActive(id) {
+  allNavLinks.forEach(function(l) {
+    l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+  });
+}
+
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) setActive(entry.target.id);
+  });
+}, { rootMargin: '-10% 0px -75% 0px' });
+
+allSections.forEach(function(s) { observer.observe(s); });
+</script>
+</body>
+</html>
