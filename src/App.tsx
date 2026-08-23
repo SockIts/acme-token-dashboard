@@ -46,6 +46,8 @@ const TOTAL_SUPPLY = 1_000_000_000
 const MINT_PRICE_SATS = 1
 const MIN_MINT_ACME = 330
 const MIN_MINT_RAW = MIN_MINT_ACME * SCALE
+const MAINNET_URL = 'https://acme.pics/dex/tokens'
+const MAINNET_ASSET_COUNT_FALLBACK = 408
 
 const TOKENOMICS = [
   { label: 'Open Mint', percent: 30, summary: 'Public launch', details: 'Mint at 1 sat on a first-come, first-served basis. No VC allocation and no presale.', className: 'alloc-open' },
@@ -82,7 +84,10 @@ const SHAREHOLDER_TIERS = [
   { key: 'black', name: 'Black Card', range: '10M+', min: 10_000_000, max: Infinity, className: 'tier-black' },
 ] as const
 
+type ShareholderTier = typeof SHAREHOLDER_TIERS[number]
+
 type MintStatus = 'idle' | 'composing' | 'signing' | 'broadcasting' | 'success' | 'error'
+type AppPage = 'home' | 'token' | 'docs'
 type TabKey = 'invest' | 'portfolio' | 'programs' | 'reports' | 'manifesto'
 type DeskMode = 'mint' | 'stake' | 'dex'
 
@@ -92,6 +97,57 @@ const NAV_ITEMS = [
   ['programs', 'Programs'],
   ['reports', 'Reports'],
   ['manifesto', 'Manifesto'],
+] as const
+
+const PROTOCOL_STATS = [
+  { label: 'Flexible storage methods', value: '4 layers' },
+  { label: 'Mainnet allocation mapped', value: '100%' },
+  { label: 'Fixed token supply', value: '1B ACME' },
+] as const
+
+const MAINNET_PREVIEW_ASSETS = [
+  { asset: 'INVISIBLE', name: 'Invisible', artist: 'LUAMBRIZ', src: '/assets/mainnet-preview/invisible.jpg', detail: 'Browse asset pages, ownership, art metadata, and provenance from the live mainnet indexer.' },
+  { asset: 'ECHOES', name: 'Echoes', artist: 'MEGANO', src: '/assets/mainnet-preview/echoes.jpg', detail: 'Mainnet assets render directly from ACME media endpoints with verifiable asset records.' },
+  { asset: 'FAMILYHOUR', name: 'Family Hour', artist: 'MATURATED', src: '/assets/mainnet-preview/familyhour.gif', detail: 'Collections and animated works can be explored, traded, and referenced across the protocol.' },
+  { asset: 'SURREAL', name: 'Surreal', artist: 'HNFTPEPE', src: '/assets/mainnet-preview/surreal.png', detail: 'Permanent Bitcoin-native art surfaces through the same asset pipeline used by the mainnet app.' },
+] as const
+
+const ART_BY_SOCKS_ASSET = '/assets/mainnet-preview/artbysocks.gif'
+
+const PROTOCOL_PILLARS = [
+  ['01', 'Permanent UTXO Storage', "Data can be embedded directly in Bitcoin's core UTXO set, replicated by full nodes instead of depending on fragile external services."],
+  ['02', 'Merkle-Proof Verification', 'Anyone can verify asset state through Merkle proofs anchored to Bitcoin consensus. ACME is built around verifiable state, not indexer trust.'],
+  ['03', 'Mineable Fee Pools', 'A UTXO-based fee pool rewards correct indexer submissions, turning honest indexing into a permissionless and economically aligned activity.'],
+  ['04', 'Artist-First Simplicity', 'Clean creator tools sit on top of protocol depth: DEX markets, auctions, generative tooling, curation, royalties, and permanent assets.'],
+] as const
+
+const PROTOCOL_FEATURES = [
+  ['Flexible Storage', 'Choose UTXO, Witness, OP_RETURN, or Arweave storage per asset and per use case.'],
+  ['Generative Studio', 'Create generative and recursive on-chain art with the art and its engine living together.'],
+  ['Native DEX + Marketplace', 'On-chain orders, dispensers, auctions, bids, and offers with deterministic settlement.'],
+  ['ACME Cortex + Tagging', 'AI-assisted asset relationships, tags, curation, provenance, and discoverability without centralized metadata.'],
+  ['DAO Governance', 'A path to community control over fees, royalties, upgrades, reserve usage, and ecosystem priorities.'],
+  ['Staking & BTC Rewards', 'Protocol fee sharing and staking are mapped into the long-term holder program.'],
+  ['Upgradable Architecture', 'A modular design intended to adapt as Bitcoin opcodes and app surfaces evolve.'],
+  ['Fair Launch Access', 'The open mint puts launch access in the community’s hands, with explicit allocations for staking, DAO, team, and activity rewards.'],
+] as const
+
+const PROTOCOL_MARKETS = [
+  ['Counterparty (XCP)', '~$345M market cap', '~$500M+ peak'],
+  ['Ordinals / BRC-20', '~$224M market cap', '~$1.5-6B peak'],
+  ['Runes', '~$172M market cap', '~$2B+ peak'],
+  ['STAMPS / SRC-20', '~$50M market cap', '~$150-300M peak'],
+  ['ACME Protocol', '~$650K FDV on launch', '1 ACME = 1 sat'],
+] as const
+
+const PROTOCOL_TEAM = [
+  ['@btc_socks', 'Co-founder', 'Bitcoin maximalist and ACME co-founder focused on decentralized Bitcoin-native tooling for artists and creators.', '/acme-protocol/team/socks.jpg', 'https://x.com/btc_socks'],
+  ['@hnftpepe', 'Co-founder', 'Digital artist and ACME co-founder specializing in on-chain creativity, vector art, and permissionless Bitcoin NFT markets.', '/acme-protocol/team/hnftpepe.jpg', 'https://x.com/HnftPepe'],
+  ['@lentymor', 'Co-founder', 'Digital art alchemist and on-chain artist pushing experimental Bitcoin art and fully on-chain creative work.', '/acme-protocol/team/mortylen.jpg', 'https://x.com/lentymor'],
+  ['@0xDerpNation', 'Tech Devs', 'Bitcoin protocol developer and Stampverse contributor focused on Stamps, recursive protocols, OLGA encoding, and on-chain innovation.', '/acme-protocol/team/derp.jpg', 'https://x.com/0xDerpNation'],
+  ['@paperbuddha', 'Ambassador', 'Contemporary Buddhist artist blending Thangka influence, vintage pulp, validator culture, and AI building.', '/acme-protocol/team/paperbuddha.jpg', 'https://x.com/paperbuddha'],
+  ['@kanemayfield', 'Ambassador', 'Writer, cultural curator, meme merchant, and Bitcoin art personality bringing irreverent energy to the ecosystem.', '/acme-protocol/team/kane.jpg', 'https://x.com/KaneMayfield'],
+  ['@desultor', 'Ambassador', 'Crunchy dystopian Bitcoin artist with bold, gritty, post-apocalyptic on-chain work and long NFT history.', '/acme-protocol/team/desultor.jpg', 'https://x.com/desultor'],
 ] as const
 
 interface AcmeContext {
@@ -148,7 +204,7 @@ function formatMintInputRaw(quantity: number): string {
   return Number.isInteger(value) ? String(value) : value.toFixed(8).replace(/0+$/, '').replace(/\.$/, '')
 }
 
-function getShareholderTier(balance: number) {
+function getShareholderTier(balance: number): ShareholderTier {
   return SHAREHOLDER_TIERS.find((tier) => balance >= tier.min && balance <= tier.max) ?? SHAREHOLDER_TIERS[0]
 }
 
@@ -514,6 +570,184 @@ function DexBuyModal({ ctx, order, onClose }: { ctx: AcmeContext; order: AtomicO
   )
 }
 
+async function getMainnetAssetCount(): Promise<number> {
+  const response = await fetch(`${API_BASE_URL}/assets?limit=1`)
+  if (!response.ok) throw new Error('Failed to load mainnet asset count')
+  const data = await response.json() as { result_count?: number }
+  if (typeof data.result_count !== 'number') throw new Error('Mainnet asset count unavailable')
+  return data.result_count
+}
+
+function HomePage({ ctx, onOpenTokenDashboard, onOpenMintDashboard }: { ctx: AcmeContext; onOpenTokenDashboard: () => void; onOpenMintDashboard: () => void }) {
+  const mainnetAssetsQuery = useQuery({
+    queryKey: ['mainnet-asset-count'],
+    queryFn: getMainnetAssetCount,
+    staleTime: 60_000,
+  })
+  const protocolStats = [
+    { label: 'Assets on mainnet', value: formatNumber(mainnetAssetsQuery.data ?? MAINNET_ASSET_COUNT_FALLBACK) },
+    ...PROTOCOL_STATS,
+  ]
+
+  return (
+    <div className="home-page">
+      <section className="protocol-hero">
+        <img src="/acme-protocol/landing-hero.webp" alt="" />
+        <div className="protocol-hero-copy">
+          <span>Bitcoin-Native Meta Protocol</span>
+          <h2>Assets that live forever on Bitcoin.</h2>
+          <p>ACME — Assets Coded on the Monetary Engine — solves fragmentation, verifiability, and permanence for digital assets on Bitcoin. Built for artists and developers who refuse to compromise.</p>
+          <div className="protocol-actions">
+            <a href={MAINNET_URL} target="_blank" rel="noreferrer">Launch Mainnet App</a>
+            <button type="button" onClick={onOpenTokenDashboard}>Open Token Dashboard</button>
+          </div>
+        </div>
+      </section>
+
+      <div className="protocol-proof">
+        {['UniSat Wallet', 'Xverse', 'Bitcoin L1', 'UTXO Set', 'Arweave', 'Witness Data', 'OP_RETURN'].map((item) => (
+          <span key={item}><i />{item}</span>
+        ))}
+      </div>
+
+      <div className="hero-metrics protocol-stats">
+        {protocolStats.map((stat) => (
+          <StatPanel key={stat.label} label={stat.label} value={stat.value} help={stat.label === 'Assets on mainnet' ? 'live mainnet asset count from the ACME API' : 'from ACMEProtocol project overview'} />
+        ))}
+      </div>
+
+      <WindowPanel title="ACME PROTOCOL -- BITCOIN ASSETS DONE RIGHT">
+        <div className="protocol-intro">
+          <div>
+            <h3>Four things no other Bitcoin protocol does together.</h3>
+            <p>ACME combines permanent storage, trustless proofs, incentivized indexing, and artist-grade tooling in a single system.</p>
+          </div>
+          <img src={ART_BY_SOCKS_ASSET} alt="" />
+        </div>
+        <div className="protocol-grid">
+          {PROTOCOL_PILLARS.map(([step, title, detail]) => (
+            <article key={title} className="protocol-card">
+              <span>{step}</span>
+              <h3>{title}</h3>
+              <p>{detail}</p>
+            </article>
+          ))}
+        </div>
+      </WindowPanel>
+
+      <WindowPanel title="FEATURES & ADVANTAGES">
+        <div className="protocol-feature-layout">
+          <div>
+            <h3>Everything you need. Nothing you do not.</h3>
+            <p>Every feature is aimed at a real pain point in existing Bitcoin asset protocols: persistence, verification, liquidity, creation, and governance.</p>
+          </div>
+          <div className="protocol-feature-grid">
+            {PROTOCOL_FEATURES.map(([title, detail]) => (
+              <article key={title}>
+                <strong>{title}</strong>
+                <p>{detail}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </WindowPanel>
+
+      <WindowPanel title="LIVE MAINNET PREVIEW">
+        <div className="protocol-preview">
+          {MAINNET_PREVIEW_ASSETS.map(({ asset, name, artist, src, detail }) => (
+            <article key={asset}>
+              <img src={src} alt="" />
+              <div>
+                <h3>{asset} <span>by {artist}</span></h3>
+                <strong>{name}</strong>
+                <p>{detail}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </WindowPanel>
+
+      <WindowPanel title="MARKET OPPORTUNITY">
+        <div className="protocol-market">
+          <div className="protocol-market-list">
+            {PROTOCOL_MARKETS.map(([name, cap, peak]) => (
+              <article key={name} className={name === 'ACME Protocol' ? 'is-acme' : ''}>
+                <div>
+                  <strong>{name}</strong>
+                  <span>{cap}</span>
+                </div>
+                <em>{peak}</em>
+              </article>
+            ))}
+          </div>
+          <div className="protocol-mainnet-card">
+            <span>Mainnet Launch</span>
+            <strong>Open Mint</strong>
+            <p>Fair launch. No VC allocation and no presale. Thirty percent of supply is available through open public minting.</p>
+            <button type="button" onClick={onOpenMintDashboard}>Mint ACME</button>
+          </div>
+        </div>
+      </WindowPanel>
+
+      <TokenomicsPanel ctx={ctx} />
+
+      <WindowPanel title="TEAM & AMBASSADORS">
+        <div className="protocol-team">
+          {PROTOCOL_TEAM.map(([name, role, detail, image, href]) => (
+            <a key={name} href={href} target="_blank" rel="noreferrer">
+              <img src={image} alt="" />
+              <strong>{name}</strong>
+              <span>{role}</span>
+              <p>{detail}</p>
+            </a>
+          ))}
+        </div>
+      </WindowPanel>
+
+      <WindowPanel title="MAINNET IS OPEN NOW">
+        <div className="protocol-cta">
+          <div>
+            <h3>Mint, trade, and build with permanent, verifiable Bitcoin assets.</h3>
+            <p>The live ACME mainnet app is the production surface for token markets, asset exploration, minting, and creator workflows.</p>
+          </div>
+          <div className="protocol-actions">
+            <a href={MAINNET_URL} target="_blank" rel="noreferrer">Launch Mainnet App</a>
+            <a href="https://acme.pics/faq" target="_blank" rel="noreferrer">Mainnet FAQ</a>
+          </div>
+        </div>
+      </WindowPanel>
+    </div>
+  )
+}
+
+function DocumentationPage() {
+  return (
+    <div className="documentation-page">
+      <WindowPanel title="DOCUMENTATION">
+        <div className="documentation-placeholder">
+          <span>Coming Soon</span>
+          <h2>ACME Protocol documentation is being assembled.</h2>
+          <p>This page will collect protocol references, wallet setup notes, minting flows, asset storage details, API examples, and creator guides inside this dashboard.</p>
+        </div>
+      </WindowPanel>
+    </div>
+  )
+}
+
+function TokenLockedPage() {
+  return (
+    <div className="token-locked-page">
+      <WindowPanel title="WALLET REQUIRED">
+        <div className="token-locked-placeholder">
+          <span>Connect Wallet</span>
+          <h2>Connect your wallet to access the token dashboard.</h2>
+          <p>The Token Dashboard reads your ACME balance, shareholder card tier, portfolio, mint allowance, staking status, and wallet-specific activity after you connect.</p>
+        </div>
+      </WindowPanel>
+    </div>
+  )
+}
+
 function InvestPage({ ctx }: { ctx: AcmeContext }) {
   return (
     <>
@@ -693,6 +927,15 @@ function StakingDesk({ ctx }: { ctx: AcmeContext }) {
 
 function ProgramsPage({ ctx }: { ctx: AcmeContext }) {
   const activeTier = getShareholderTier(ctx.walletAcmeWhole)
+  const [selectedTierKey, setSelectedTierKey] = useState<ShareholderTier['key']>(activeTier.key)
+  const selectedTier = SHAREHOLDER_TIERS.find((tier) => tier.key === selectedTierKey) ?? activeTier
+  const activeTierIndex = SHAREHOLDER_TIERS.findIndex((tier) => tier.key === activeTier.key)
+  const previewIsCurrent = selectedTier.key === activeTier.key
+
+  useEffect(() => {
+    setSelectedTierKey(activeTier.key)
+  }, [ctx.wallet.address, activeTier.key])
+
   const programs = [
     ['Kek.Works', 'Generative PFP collections', 'A launch studio for creating generative PFP collections on ACME, from trait assembly through mint-ready collection drops.'],
     ['Artcore Directory Studio', 'Generative ACME art', 'A creation environment for generative ACME art, giving artists a structured path to publish coded collections and on-chain editions.'],
@@ -715,30 +958,41 @@ function ProgramsPage({ ctx }: { ctx: AcmeContext }) {
       <WindowPanel title="SHAREHOLDER CARD">
         <div className="shareholder-card">
           <div className="card-display">
-            <div className={`card-art ${activeTier.className}`}>
+            <div className={`card-art ${selectedTier.className}`}>
               <span>ACME CAPITAL</span>
-              <strong>{activeTier.name}</strong>
-              <em>{ctx.wallet.connected ? `${activeTier.range} ACME holder tier` : 'Connect wallet to reveal your tier'}</em>
+              <strong>{selectedTier.name}</strong>
+              <em>{previewIsCurrent && ctx.wallet.connected ? `${activeTier.range} ACME holder tier` : `${selectedTier.range} ACME preview`}</em>
               <dl>
                 <div><dt>HOLDINGS</dt><dd>{formatNumber(ctx.walletAcmeWhole, 4)} ACME</dd></div>
-                <div><dt>STANDING</dt><dd>{ctx.wallet.connected ? activeTier.name : '0'}</dd></div>
+                <div><dt>STATUS</dt><dd>{previewIsCurrent && ctx.wallet.connected ? activeTier.name : 'Mint ACME'}</dd></div>
                 <div><dt>PROGRAMS</dt><dd>5</dd></div>
               </dl>
               <small>{shortAddress(ctx.wallet.address)}</small>
               <span className="card-logo">ACME</span>
             </div>
             <div className="card-tier-strip" aria-label="Shareholder card tiers">
-              {SHAREHOLDER_TIERS.map((tier) => (
-                <button
-                  type="button"
-                  key={tier.key}
-                  className={`tier-thumb ${tier.className} ${tier.key === activeTier.key ? 'active' : ''}`}
-                  aria-pressed={tier.key === activeTier.key}
-                >
-                  <span>{tier.name}</span>
-                  <small>{tier.range}</small>
-                </button>
-              ))}
+              {SHAREHOLDER_TIERS.map((tier, index) => {
+                const isCurrent = tier.key === activeTier.key
+                const isSelected = tier.key === selectedTier.key
+                const isLockedPreview = index > activeTierIndex
+
+                return (
+                  <div key={tier.key} className={`tier-choice ${isCurrent ? 'current' : ''}`}>
+                    <button
+                      type="button"
+                      className={`tier-thumb ${tier.className} ${isSelected ? 'selected' : ''} ${isCurrent ? 'active' : ''} ${isLockedPreview ? 'future-tier' : ''}`}
+                      aria-pressed={isSelected}
+                      aria-current={isCurrent ? 'true' : undefined}
+                      onClick={() => setSelectedTierKey(tier.key)}
+                    >
+                      <span>{tier.name}</span>
+                    </button>
+                    <span className="tier-current-indicator" aria-hidden={!isCurrent}>
+                      {isCurrent ? 'Current' : '\u00a0'}
+                    </span>
+                  </div>
+                )
+              })}
             </div>
           </div>
           <div className="program-list">
@@ -1127,6 +1381,7 @@ function Metric({ label, value, note }: { label: string; value: string; note: st
 export default function App() {
   const wallet = useWallet()
   const stakingConfig = getStakingNetworkConfig()
+  const [activeAppPage, setActiveAppPage] = useState<AppPage>('home')
   const [activeTab, setActiveTab] = useState<TabKey>('invest')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [quantity, setQuantity] = useState(String(MIN_MINT_ACME))
@@ -1339,7 +1594,7 @@ export default function App() {
     handleMint,
   }
 
-  const pages: Record<TabKey, ReactNode> = {
+  const tokenPages: Record<TabKey, ReactNode> = {
     invest: <InvestPage ctx={ctx} />,
     portfolio: <PortfolioPage ctx={ctx} />,
     programs: <ProgramsPage ctx={ctx} />,
@@ -1348,62 +1603,95 @@ export default function App() {
   }
 
   return (
-    <main className="dashboard">
-      <div className="ticker">ACME IS LIVE · ART CODED ON THE MONETARY ENGINE · TOKEN MINT TERMINAL</div>
-      <header className="masthead">
-        <div>
-          <h1>ACME Token Dashboard</h1>
-          <p>Shareholder services terminal · live ACME mint and tokenomics pages · asset {ASSET}</p>
-        </div>
-      </header>
-
-      <nav className="tabs">
-        {NAV_ITEMS.map(([key, label]) => (
-          <button key={key} type="button" className={activeTab === key ? 'active' : ''} onClick={() => setActiveTab(key)}>
-            {label}
+    <div className="app-shell">
+      <div className="side-column">
+        <aside className="side-nav" aria-label="ACME navigation">
+          <div className="side-brand">
+            <span>ACME</span>
+            <strong>Protocol</strong>
+          </div>
+          <button type="button" className={activeAppPage === 'home' ? 'active' : ''} onClick={() => setActiveAppPage('home')}>
+            Home
           </button>
-        ))}
-        <span className="tab-spacer" />
-        <WalletPicker />
-      </nav>
+          <button type="button" className={activeAppPage === 'token' ? 'active' : ''} onClick={() => setActiveAppPage('token')}>
+            Token Dashboard
+          </button>
+          <button type="button" className={activeAppPage === 'docs' ? 'active' : ''} onClick={() => setActiveAppPage('docs')}>
+            Documentation
+          </button>
+        </aside>
 
-      <nav className="mobile-nav" aria-label="Mobile page navigation">
-        <button
-          type="button"
-          className="mobile-menu-toggle"
-          aria-expanded={mobileMenuOpen}
-          aria-controls="mobile-page-menu"
-          onClick={() => setMobileMenuOpen((value) => !value)}
-        >
-          <span className="menu-bars" aria-hidden="true"><i /><i /><i /></span>
-          <strong>{NAV_ITEMS.find(([key]) => key === activeTab)?.[1]}</strong>
-        </button>
-        <div id="mobile-page-menu" className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
-          {NAV_ITEMS.map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              className={activeTab === key ? 'active' : ''}
-              onClick={() => {
-                setActiveTab(key)
-                setMobileMenuOpen(false)
-              }}
-            >
-              {label}
-            </button>
-          ))}
+        <div className="side-wallet" aria-label="Wallet connection">
+          <span>Wallet</span>
           <WalletPicker />
         </div>
-      </nav>
+      </div>
 
-      {pages[activeTab]}
+      <main className="dashboard">
+        <div className="ticker">ACME IS LIVE · ART CODED ON THE MONETARY ENGINE · TOKEN MINT TERMINAL</div>
+        <header className="masthead">
+          <div>
+            <h1>{activeAppPage === 'home' ? 'ACME Protocol' : activeAppPage === 'docs' ? 'Documentation' : 'ACME Token Dashboard'}</h1>
+            <p>{activeAppPage === 'home' ? 'Assets Coded on the Monetary Engine · Bitcoin-native protocol overview' : activeAppPage === 'docs' ? 'Protocol references, creator guides, and API notes placeholder' : `Shareholder services terminal · live ACME mint and tokenomics pages · asset ${ASSET}`}</p>
+          </div>
+        </header>
 
-      <footer className="terminal-footer">
-        <span><i /> CONNECTED</span>
-        <span>LIVE FEED</span>
-        <a href="https://acme.pics/" target="_blank" rel="noreferrer">BITCOIN · ACME</a>
-        <span>BLOCK {formatNumber(stats?.as_of_block)}</span>
-      </footer>
-    </main>
+        {activeAppPage === 'token' && wallet.connected && (
+          <>
+            <nav className="tabs">
+              {NAV_ITEMS.map(([key, label]) => (
+                <button key={key} type="button" className={activeTab === key ? 'active' : ''} onClick={() => setActiveTab(key)}>
+                  {label}
+                </button>
+              ))}
+            </nav>
+
+            <nav className="mobile-nav" aria-label="Mobile page navigation">
+              <button
+                type="button"
+                className="mobile-menu-toggle"
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-page-menu"
+                onClick={() => setMobileMenuOpen((value) => !value)}
+              >
+                <span className="menu-bars" aria-hidden="true"><i /><i /><i /></span>
+                <strong>{NAV_ITEMS.find(([key]) => key === activeTab)?.[1]}</strong>
+              </button>
+              <div id="mobile-page-menu" className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+                {NAV_ITEMS.map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className={activeTab === key ? 'active' : ''}
+                    onClick={() => {
+                      setActiveTab(key)
+                      setMobileMenuOpen(false)
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </nav>
+          </>
+        )}
+
+        {activeAppPage === 'home' && (
+          <HomePage ctx={ctx} onOpenTokenDashboard={() => setActiveAppPage('token')} onOpenMintDashboard={() => {
+            setActiveAppPage('token')
+            setActiveTab('invest')
+          }} />
+        )}
+        {activeAppPage === 'docs' && <DocumentationPage />}
+        {activeAppPage === 'token' && (wallet.connected ? tokenPages[activeTab] : <TokenLockedPage />)}
+
+        <footer className="terminal-footer">
+          <span><i /> CONNECTED</span>
+          <span>LIVE FEED</span>
+          <a href="https://acme.pics/" target="_blank" rel="noreferrer">BITCOIN · ACME</a>
+          <span>BLOCK {formatNumber(stats?.as_of_block)}</span>
+        </footer>
+      </main>
+    </div>
   )
 }

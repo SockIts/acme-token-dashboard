@@ -10,6 +10,15 @@ export function WalletPicker() {
   const wallet = useWallet()
   const [open, setOpen] = useState(false)
 
+  async function handleConnect(provider: WalletProvider) {
+    try {
+      await wallet.connect(provider)
+      setOpen(false)
+    } catch {
+      setOpen(true)
+    }
+  }
+
   if (wallet.connected && wallet.address) {
     return (
       <div className="wallet-chip">
@@ -21,19 +30,24 @@ export function WalletPicker() {
 
   return (
     <div className="wallet-connect">
-      <button type="button" className="win-button" onClick={() => setOpen((value) => !value)}>
+      <button
+        type="button"
+        className="win-button"
+        aria-expanded={open}
+        aria-controls="wallet-provider-menu"
+        disabled={wallet.connecting}
+        onClick={() => setOpen((value) => !value)}
+      >
         {wallet.connecting ? 'Connecting...' : 'Connect account'}
       </button>
       {open && (
-        <div className="wallet-menu">
+        <div id="wallet-provider-menu" className="wallet-menu">
           {wallet.wallets.map((option) => (
             <button
               key={option.provider}
               type="button"
-              disabled={!option.installed || option.comingSoon || !option.bitcoinSupported}
-              onClick={() => {
-                void wallet.connect(option.provider as WalletProvider).then(() => setOpen(false))
-              }}
+              disabled={wallet.connecting || !option.installed || option.comingSoon || !option.bitcoinSupported}
+              onClick={() => void handleConnect(option.provider as WalletProvider)}
             >
               <span className="wallet-icon" aria-hidden="true">
                 <img src={option.icon} alt="" />
