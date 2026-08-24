@@ -256,6 +256,10 @@ function formatUsd(value: number | null | undefined, decimals = 0): string {
   })
 }
 
+function getVolumePhaseNote(fills: number | null | undefined): string {
+  return fills && fills > 0 ? `${formatNumber(fills)} fills in the last day.` : 'Currently in mint phase.'
+}
+
 function shortAddress(address: string | null | undefined): string {
   if (!address) return '--'
   return address.length > 18 ? `${address.slice(0, 8)}...${address.slice(-6)}` : address
@@ -816,12 +820,18 @@ function TokenLockedPage() {
 }
 
 function InvestPage({ ctx }: { ctx: AcmeContext }) {
+  const circulatingMarketCapSats = ctx.supplyWhole === undefined ? null : ctx.supplyWhole * MINT_PRICE_SATS
+  const circulatingMarketCapUsd = circulatingMarketCapSats === null || ctx.bitcoinUsd === null
+    ? null
+    : (circulatingMarketCapSats / SCALE) * ctx.bitcoinUsd
+  const circulatingPercent = ctx.supplyWhole === undefined ? null : (ctx.supplyWhole / TOTAL_SUPPLY) * 100
+
   return (
     <>
       <div className="hero-metrics">
         <StatPanel label="ACME PRICE" value={ctx.pricing?.pricingRatio ?? '--'} help={ctx.pricing?.pricePerToken ?? 'active openminter pricing'} />
         <StatPanel label="MINT CAPACITY" value={`${formatOpenMinterQuantity(ctx.remainingRaw, true)} ACME`} help="unissued supply available through the openminter" />
-        <StatPanel label="NEXT CHECK" value={`${formatNumber(ctx.stats?.as_of_block)} blk`} help="live indexer block for this terminal" />
+        <StatPanel label="CIRC MARKET CAP" value={formatUsd(circulatingMarketCapUsd)} help={`${formatNumber(circulatingPercent, 2)}% of fixed supply circulating at the 1 sat mint price`} />
       </div>
 
       <WindowPanel title="SHAREHOLDER DESK -- MINT ACME">
@@ -856,7 +866,7 @@ function InvestPage({ ctx }: { ctx: AcmeContext }) {
           <Metric label="Mint status" value={ctx.minter ? 'Open' : 'Closed'} note="This dashboard uses the active divisible openminter when one is indexed." />
           <Metric label="Holders" value={formatNumber(ctx.stats?.holder_count)} note="Unique indexed ACME holders." />
           <Metric label="Listings" value={formatNumber(ctx.stats?.open_listings_count)} note="Open market listings for ACME." />
-          <Metric label="24h volume" value={formatSats(ctx.stats?.volume_24h_sats)} note={`${formatNumber(ctx.stats?.fills_24h_count)} fills in the last day.`} />
+          <Metric label="24h volume" value={formatSats(ctx.stats?.volume_24h_sats)} note={getVolumePhaseNote(ctx.stats?.fills_24h_count)} />
         </div>
       </WindowPanel>
     </>
@@ -1163,7 +1173,7 @@ function ReportsPage({ ctx }: { ctx: AcmeContext }) {
           <StatPanel label="BTC/USD" value={formatUsd(ctx.bitcoinUsd, 0)} help="CoinGecko reference price for USD estimates" />
           <StatPanel label="FDV" value={formatSats(fdvSats)} help="1B ACME estimated at the 1 sat mint value" />
           <StatPanel label="FDV USD" value={formatUsd(fdvUsd)} help="1B ACME x 1 sat mint value x BTC/USD" />
-          <StatPanel label="24H VOLUME" value={formatSats(ctx.stats?.volume_24h_sats)} help={`${formatNumber(ctx.stats?.fills_24h_count)} fills in the last day`} />
+          <StatPanel label="24H VOLUME" value={formatSats(ctx.stats?.volume_24h_sats)} help={getVolumePhaseNote(ctx.stats?.fills_24h_count)} />
           <StatPanel label="HOLDERS" value={formatNumber(ctx.stats?.holder_count)} help="unique indexed token holders" />
           <StatPanel label="HARD CAP" value={ctx.capWhole ? `${formatNumber(ctx.capWhole, 8)} ACME` : '--'} help="maximum distributable mint supply" />
           <StatPanel label="MAX PER TX" value={ctx.minter ? `${formatOpenMinterQuantity(ctx.minter.max_mint_per_tx, true)} ACME` : '--'} help="largest quantity the minter allows per transaction" />
