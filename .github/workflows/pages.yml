@@ -35,7 +35,7 @@ jobs:
         env:
           VITE_API_URL: https://acme.pics/api
           VITE_ADMIN_API_URL: https://acme.pics/admin
-          VITE_BASE_PATH: /acme-token-dashboard/
+          VITE_BASE_PATH: /
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
