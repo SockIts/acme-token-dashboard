@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
   const adminTarget = readEnv('VITE_ADMIN_PROXY_TARGET', apiOrigin)
   const rewritePrefix = apiTarget.endsWith('/api') ? '' : '/v2'
   const acmeNetwork = readEnv('ACME_NETWORK', 'mainnet')
-  const basePath = readEnv('VITE_BASE_PATH', mode === 'production' ? '/acme-token-dashboard/' : '/')
+  const basePath = readEnv('VITE_BASE_PATH', mode === 'production' ? '/' : '/')
 
   return {
     base: basePath,
