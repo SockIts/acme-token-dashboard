@@ -6128,3 +6128,120 @@ body,
     text-shadow: 1px 1px 0 var(--ink);
   }
 }
+
+.app-shell {
+  border: 0;
+  box-shadow: none;
+}
+
+.app-shell .dashboard {
+  border: 2px solid var(--ink);
+  box-shadow: 3px 3px 0 rgba(2, 5, 3, 0.75);
+}
+
+.side-nav {
+  border: 0;
+  box-shadow: none;
+  padding-top: 0;
+}
+
+.dashboard-token .panel .stat-value {
+  color: #f0904c;
+  font-size: clamp(22px, 2.45vw, 33px);
+  line-height: 0.96;
+  text-shadow:
+    0 0 1px rgba(255, 240, 220, 0.95),
+    0 0 4px rgba(240, 144, 76, 0.78),
+    0 0 9px rgba(255, 176, 90, 0.38);
+  animation: terminal-value-flicker 7.5s steps(1, end) infinite;
+}
+
+@keyframes terminal-value-flicker {
+  0%, 100% {
+    opacity: 1;
+    text-shadow:
+      0 0 1px rgba(255, 240, 220, 0.95),
+      0 0 4px rgba(240, 144, 76, 0.78),
+      0 0 9px rgba(255, 176, 90, 0.38);
+  }
+  18% {
+    opacity: 0.9;
+    text-shadow:
+      0 0 1px rgba(255, 240, 220, 0.82),
+      0 0 3px rgba(240, 144, 76, 0.62),
+      0 0 7px rgba(255, 176, 90, 0.28);
+  }
+  19% {
+    opacity: 1;
+    text-shadow:
+      0 0 1px rgba(255, 240, 220, 1),
+      0 0 5px rgba(240, 144, 76, 0.88),
+      0 0 11px rgba(255, 176, 90, 0.44);
+  }
+  64% { opacity: 0.9; }
+  65% {
+    opacity: 1;
+    text-shadow:
+      0 0 1px rgba(255, 240, 220, 1),
+      0 0 6px rgba(240, 144, 76, 0.92),
+      0 0 12px rgba(255, 176, 90, 0.48);
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding-bottom: 2px;
+  }
+
+  .side-nav {
+    padding-bottom: 1px;
+  }
+
+  .dashboard-token,
+  .dashboard-docs {
+    font-size: 12px;
+  }
+
+  .dashboard-token h1,
+  .dashboard-docs h1 {
+    font-size: clamp(24px, 8vw, 34px);
+  }
+
+  .dashboard-token .masthead p,
+  .dashboard-docs .masthead p {
+    font-size: 8.5px;
+    line-height: 1.15;
+  }
+
+  .dashboard-token .ticker,
+  .dashboard-docs .ticker,
+  .dashboard-token .tabs button,
+  .dashboard-docs .tabs button,
+  .dashboard-token .win-button,
+  .dashboard-docs .win-button,
+  .dashboard-token .window-title,
+  .dashboard-docs .window-title,
+  .dashboard-token .stat-label,
+  .dashboard-docs .stat-label,
+  .dashboard-token .stat-value,
+  .dashboard-docs .stat-value,
+  .dashboard-token .stat-help,
+  .dashboard-docs .stat-help,
+  .dashboard-token td,
+  .dashboard-docs td,
+  .dashboard-token th,
+  .dashboard-docs th {
+    font-size: 0.92em;
+  }
+
+  .dashboard-docs .documentation-hero h2,
+  .dashboard-token .token-locked-placeholder h2 {
+    font-size: clamp(17px, 5.4vw, 25px);
+  }
+
+  .dashboard-docs .documentation-hero p,
+  .dashboard-docs .documentation-reader-summary p,
+  .dashboard-token .token-locked-placeholder p {
+    font-size: 10.5px;
+  }
+}

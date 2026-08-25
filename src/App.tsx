@@ -1805,7 +1805,7 @@ export default function App() {
           </div>
         </div>
 
-        <main className="dashboard">
+        <main className={`dashboard dashboard-${activeAppPage}`}>
           <div className="ticker">ACME IS LIVE · ART CODED ON THE MONETARY ENGINE · TOKEN MINT TERMINAL · {formatFreshness(liveUpdatedAt)}</div>
           <header className="masthead">
             <div>
