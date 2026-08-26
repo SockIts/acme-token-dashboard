@@ -4902,7 +4902,7 @@ fieldset input,
   grid-template-columns: 180px minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
   gap: 12px;
-  width: min(1320px, calc(100% - 32px));
+  width: min(1400px, calc(100% - 32px));
   height: calc(100vh - 24px);
   margin: 12px auto;
   padding: 12px;
@@ -6243,5 +6243,136 @@ body,
   .dashboard-docs .documentation-reader-summary p,
   .dashboard-token .token-locked-placeholder p {
     font-size: 10.5px;
+  }
+}
+
+.dashboard-docs .documentation-typed,
+.dashboard-token .wallet-required-typed {
+  display: grid;
+  justify-items: start;
+  gap: 0.02em;
+  width: 100%;
+  max-width: 980px;
+}
+
+.dashboard-docs .documentation-typed span,
+.dashboard-token .wallet-required-typed span {
+  display: block;
+  width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  color: inherit;
+  border-right: 3px solid var(--green-dark);
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.dashboard-docs .documentation-typed .documentation-typed-line-one {
+  animation:
+    documentation-type-one 1.55s steps(36, end) 0.2s forwards,
+    documentation-caret 0.62s steps(1, end) 0.2s infinite,
+    documentation-caret-stop 0.01s linear 1.75s forwards;
+}
+
+.dashboard-docs .documentation-typed .documentation-typed-line-two {
+  border-color: transparent;
+  animation:
+    documentation-type-two 1s steps(22, end) 1.75s forwards,
+    documentation-caret 0.62s steps(1, end) 1.75s infinite;
+}
+
+.dashboard-token .wallet-required-typed .wallet-required-line-one {
+  animation:
+    wallet-required-type-one 1.45s steps(33, end) 0.2s forwards,
+    wallet-required-caret 0.62s steps(1, end) 0.2s infinite,
+    wallet-required-caret-stop 0.01s linear 1.65s forwards;
+}
+
+.dashboard-token .wallet-required-typed .wallet-required-line-two {
+  border-color: transparent;
+  animation:
+    wallet-required-type-two 0.8s steps(16, end) 1.65s forwards,
+    wallet-required-caret 0.62s steps(1, end) 1.65s infinite;
+}
+
+@keyframes documentation-type-one {
+  to { width: 36ch; }
+}
+
+@keyframes documentation-type-two {
+  to { width: 22ch; }
+}
+
+@keyframes wallet-required-type-one {
+  to { width: 33ch; }
+}
+
+@keyframes wallet-required-type-two {
+  to { width: 16ch; }
+}
+
+@keyframes documentation-caret {
+  0%, 49% { border-color: var(--green-dark); }
+  50%, 100% { border-color: transparent; }
+}
+
+@keyframes wallet-required-caret {
+  0%, 49% { border-color: var(--green-dark); }
+  50%, 100% { border-color: transparent; }
+}
+
+@keyframes documentation-caret-stop {
+  to { border-color: transparent; }
+}
+
+@keyframes wallet-required-caret-stop {
+  to { border-color: transparent; }
+}
+
+.home-page .protocol-stats .stat-value,
+.dashboard-token .panel .stat-value {
+  margin-top: 8px;
+  margin-bottom: 9px;
+  font-size: clamp(24px, 2.8vw, 38px);
+  line-height: 0.98;
+}
+
+.home-page .protocol-stats .stat-help,
+.dashboard-token .panel .stat-help {
+  margin-top: 3px;
+  font-size: 10px;
+  line-height: 1.12;
+}
+
+.dashboard-token .portfolio-strip strong,
+.dashboard-token .split-list strong,
+.dashboard-token .tokenomics-footer strong {
+  margin-top: 8px;
+  margin-bottom: 9px;
+  font-size: clamp(20px, 2.25vw, 31px);
+  line-height: 0.98;
+}
+
+.dashboard-token .portfolio-strip small,
+.dashboard-token .split-list small,
+.dashboard-token .tokenomics-footer span {
+  margin-top: 3px;
+  font-size: 10px;
+  line-height: 1.12;
+}
+
+@media (max-width: 640px) {
+  .home-page .protocol-stats .stat-value,
+  .dashboard-token .panel .stat-value {
+    font-size: clamp(21px, 7vw, 30px);
+  }
+
+  .dashboard-token .portfolio-strip strong,
+  .dashboard-token .split-list strong,
+  .dashboard-token .tokenomics-footer strong {
+    font-size: clamp(19px, 6vw, 27px);
   }
 }

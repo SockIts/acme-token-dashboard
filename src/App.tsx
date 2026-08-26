@@ -819,7 +819,10 @@ function DocumentationPage() {
       <WindowPanel title="DOCUMENTATION -- ACME PROTOCOL LIBRARY">
         <div className="documentation-hero">
           <span>Reference Shelf</span>
-          <h2>Protocol docs for builders, artists, traders, and indexers.</h2>
+          <h2 className="documentation-typed">
+            <span className="documentation-typed-line-one">Protocol docs for builders, artists,</span>
+            <span className="documentation-typed-line-two">traders, and indexers.</span>
+          </h2>
           <p>Read the current ACME references inside the dashboard: Cortex usage, atomic swaps, runtime behavior, and the routing architecture that connects fees back to protocol services.</p>
         </div>
       </WindowPanel>
@@ -857,15 +860,59 @@ function DocumentationPage() {
   )
 }
 
-function TokenLockedPage() {
+function TokenLockedPage({ ctx }: { ctx: AcmeContext }) {
+  const circulatingValueSats = ctx.supplyWhole === undefined ? null : ctx.supplyWhole * MINT_PRICE_SATS
+  const fdvSats = TOTAL_SUPPLY * MINT_PRICE_SATS
+  const circulatingValueUsd = circulatingValueSats === null || ctx.bitcoinUsd === null
+    ? null
+    : (circulatingValueSats / SCALE) * ctx.bitcoinUsd
+  const fdvUsd = ctx.bitcoinUsd === null ? null : (fdvSats / SCALE) * ctx.bitcoinUsd
+
   return (
     <div className="token-locked-page">
       <WindowPanel title="WALLET REQUIRED">
         <div className="token-locked-placeholder">
           <span>Connect Wallet</span>
-          <h2>Connect your wallet to access the token dashboard.</h2>
+          <h2 className="wallet-required-typed">
+            <span className="wallet-required-line-one">Connect your wallet to access the</span>
+            <span className="wallet-required-line-two">token dashboard.</span>
+          </h2>
           <p>The Token Dashboard reads your ACME balance, shareholder card tier, portfolio, mint allowance, staking status, and wallet-specific activity after you connect.</p>
         </div>
+      </WindowPanel>
+
+      <WindowPanel title="ACME TOKEN -- PUBLIC SNAPSHOT">
+        <div className="two-figures">
+          <StatPanel label="CIRCULATING SUPPLY" value={`${formatNumber(ctx.supplyWhole, 8)} ACME`} help="indexed supply currently moving in wallets and orders" loading={ctx.statsLoading} />
+          <StatPanel label="MINTABLE REMAINDER" value={`${formatOpenMinterQuantity(ctx.remainingRaw, true)} ACME`} help="unissued capacity remaining in the active openminter" loading={ctx.minterLoading} />
+        </div>
+      </WindowPanel>
+
+      <WindowPanel title="KEY METRICS">
+        <div className="metrics-grid">
+          <StatPanel label="CIRC VALUE" value={formatSats(circulatingValueSats)} help="issued ACME estimated at the 1 sat mint value" loading={ctx.statsLoading} />
+          <StatPanel label="CIRC VALUE USD" value={formatUsd(circulatingValueUsd)} help="circulating estimate converted with live BTC/USD" loading={ctx.statsLoading || ctx.marketLoading} />
+          <StatPanel label="FLOOR" value={formatSats(ctx.stats?.floor_price_sats)} help="lowest open listing per whole ACME" loading={ctx.statsLoading} />
+          <StatPanel label="BTC/USD" value={formatUsd(ctx.bitcoinUsd, 0)} help="CoinGecko reference price for USD estimates" loading={ctx.marketLoading} />
+          <StatPanel label="FDV" value={formatSats(fdvSats)} help="1B ACME estimated at the 1 sat mint value" />
+          <StatPanel label="FDV USD" value={formatUsd(fdvUsd)} help="1B ACME x 1 sat mint value x BTC/USD" loading={ctx.marketLoading} />
+          <StatPanel label="24H VOLUME" value={formatSats(ctx.stats?.volume_24h_sats)} help={getVolumePhaseNote(ctx.stats?.fills_24h_count)} loading={ctx.statsLoading} />
+          <StatPanel label="HOLDERS" value={formatNumber(ctx.stats?.holder_count)} help="unique indexed token holders" loading={ctx.statsLoading} />
+        </div>
+      </WindowPanel>
+
+      <WindowPanel title="TOKENOMICS -- READ ONLY">
+        <div className="progress-track"><span style={{ width: `${ctx.progress}%` }} /></div>
+        <table className="tokenomics-table">
+          <tbody>
+            <tr><td>Asset</td><td>{ctx.stats?.asset_longname || ASSET}</td><td>100.0%</td></tr>
+            <tr><td>Supply issued</td><td>{formatNumber(ctx.supplyWhole, 8)} ACME</td><td>{formatNumber(ctx.progress, 2)}%</td></tr>
+            <tr><td>Mint capacity left</td><td>{formatOpenMinterQuantity(ctx.remainingRaw, true)} ACME</td><td>{formatNumber(100 - ctx.progress, 2)}%</td></tr>
+            <tr><td>Open listings</td><td>{formatNumber(ctx.stats?.open_listings_count)}</td><td>DEX</td></tr>
+            <tr><td>Mint price</td><td>{ctx.pricing?.pricingRatio ?? '--'}</td><td>{ctx.pricing?.pricePerToken ?? 'openminter'}</td></tr>
+            <tr><td>Indexer block</td><td>{formatNumber(ctx.stats?.as_of_block)}</td><td>Live feed</td></tr>
+          </tbody>
+        </table>
       </WindowPanel>
     </div>
   )
@@ -1862,7 +1909,7 @@ export default function App() {
               }} />
             )}
             {activeAppPage === 'docs' && <DocumentationPage />}
-            {activeAppPage === 'token' && (wallet.connected ? tokenPages[activeTab] : <TokenLockedPage />)}
+            {activeAppPage === 'token' && (wallet.connected ? tokenPages[activeTab] : <TokenLockedPage ctx={ctx} />)}
           </section>
 
         <footer className="terminal-footer">
