@@ -6149,11 +6149,8 @@ body,
   color: #f0904c;
   font-size: clamp(22px, 2.45vw, 33px);
   line-height: 0.96;
-  text-shadow:
-    0 0 1px rgba(255, 240, 220, 0.95),
-    0 0 4px rgba(240, 144, 76, 0.78),
-    0 0 9px rgba(255, 176, 90, 0.38);
-  animation: terminal-value-flicker 7.5s steps(1, end) infinite;
+  text-shadow: none;
+  animation: none;
 }
 
 @keyframes terminal-value-flicker {
@@ -6375,4 +6372,72 @@ body,
   .dashboard-token .tokenomics-footer strong {
     font-size: clamp(19px, 6vw, 27px);
   }
+}
+
+.dashboard-token.token-number-typing .stat-panel:not(.is-loading) .stat-value {
+  --token-number-delay: 0.08s;
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(0 100% 0 0);
+  animation: token-number-type 0.58s steps(18, end) forwards;
+  animation-delay: var(--token-number-delay);
+}
+
+.dashboard-token.token-number-typing .stat-panel:not(.is-loading) .stat-value::after {
+  content: "";
+  position: absolute;
+  top: 0.08em;
+  right: 0;
+  bottom: 0.08em;
+  width: 2px;
+  background: currentColor;
+  opacity: 0;
+  animation:
+    token-number-caret 0.58s steps(1, end) var(--token-number-delay) forwards,
+    token-number-caret-hide 0.01s linear calc(var(--token-number-delay) + 0.58s) forwards;
+}
+
+.dashboard-token.token-number-typing .hero-metrics .stat-panel:nth-of-type(1) .stat-value,
+.dashboard-token.token-number-typing .two-figures .stat-panel:nth-of-type(1) .stat-value,
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(1) .stat-value { --token-number-delay: 0.08s; }
+
+.dashboard-token.token-number-typing .hero-metrics .stat-panel:nth-of-type(2) .stat-value,
+.dashboard-token.token-number-typing .two-figures .stat-panel:nth-of-type(2) .stat-value,
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(2) .stat-value { --token-number-delay: 0.22s; }
+
+.dashboard-token.token-number-typing .hero-metrics .stat-panel:nth-of-type(3) .stat-value,
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(3) .stat-value { --token-number-delay: 0.36s; }
+
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(4) .stat-value { --token-number-delay: 0.5s; }
+
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(5) .stat-value { --token-number-delay: 0.64s; }
+
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(6) .stat-value { --token-number-delay: 0.78s; }
+
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(7) .stat-value { --token-number-delay: 0.92s; }
+
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(8) .stat-value { --token-number-delay: 1.06s; }
+
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(9) .stat-value { --token-number-delay: 1.2s; }
+
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(10) .stat-value { --token-number-delay: 1.34s; }
+
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(11) .stat-value { --token-number-delay: 1.48s; }
+
+.dashboard-token.token-number-typing .metrics-grid .stat-panel:nth-of-type(12) .stat-value { --token-number-delay: 1.62s; }
+
+@keyframes token-number-type {
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes token-number-caret {
+  0%, 100% { opacity: 1; }
+}
+
+@keyframes token-number-caret-hide {
+  to { opacity: 0; }
 }

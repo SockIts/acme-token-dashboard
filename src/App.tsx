@@ -1578,6 +1578,8 @@ export default function App() {
   const [mintStatus, setMintStatus] = useState<MintStatus>('idle')
   const [mintMessage, setMintMessage] = useState<string | null>(null)
   const [txid, setTxid] = useState<string | null>(null)
+  const [tokenNumberTypingActive, setTokenNumberTypingActive] = useState(false)
+  const [tokenNumberTypingCompleteKey, setTokenNumberTypingCompleteKey] = useState<string | null>(null)
 
   const statsQuery = useQuery({
     queryKey: ['token-stats', ASSET],
@@ -1706,6 +1708,25 @@ export default function App() {
     bitcoinUsdQuery.dataUpdatedAt,
   )
   const liveLoading = statsQuery.isLoading || minterQuery.isLoading || listingsQuery.isLoading || bitcoinUsdQuery.isLoading
+  const connectedWalletKey = wallet.connected && wallet.address ? `${wallet.provider}:${wallet.address}` : null
+
+  useEffect(() => {
+    if (!connectedWalletKey) {
+      setTokenNumberTypingActive(false)
+      setTokenNumberTypingCompleteKey(null)
+      return
+    }
+
+    if (tokenNumberTypingCompleteKey === connectedWalletKey) return
+
+    setTokenNumberTypingActive(true)
+    const timer = window.setTimeout(() => {
+      setTokenNumberTypingActive(false)
+      setTokenNumberTypingCompleteKey(connectedWalletKey)
+    }, 2600)
+
+    return () => window.clearTimeout(timer)
+  }, [connectedWalletKey, tokenNumberTypingCompleteKey])
 
   const handleSkipIntro = () => setIntroVisible(false)
   const handleDisableIntro = () => {
@@ -1852,7 +1873,7 @@ export default function App() {
           </div>
         </div>
 
-        <main className={`dashboard dashboard-${activeAppPage}`}>
+        <main className={`dashboard dashboard-${activeAppPage} ${tokenNumberTypingActive ? 'token-number-typing' : ''}`}>
           <div className="ticker">ACME IS LIVE · ART CODED ON THE MONETARY ENGINE · TOKEN MINT TERMINAL · {formatFreshness(liveUpdatedAt)}</div>
           <header className="masthead">
             <div>
