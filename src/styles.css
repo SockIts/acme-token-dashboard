@@ -367,11 +367,11 @@ button, input {
 }
 
 @keyframes home-headline-type-one {
-  to { width: 24ch; }
+  to { width: 16ch; }
 }
 
 @keyframes home-headline-type-two {
-  to { width: 11ch; }
+  to { width: 19ch; }
 }
 
 @keyframes home-headline-caret {
@@ -4472,50 +4472,22 @@ fieldset input,
     position: sticky;
     top: 0;
     z-index: 80;
-    display: block;
+    display: grid;
     margin: 0 0 7px;
     background: var(--paper);
     border: 2px solid var(--ink);
     box-shadow: inset 2px 2px 0 var(--paper-light), inset -2px -2px 0 var(--paper-dark), 3px 3px 0 var(--shadow);
   }
 
-  .mobile-menu-toggle {
-    display: grid;
-    grid-template-columns: 28px minmax(0, 1fr);
-    align-items: center;
-    width: 100%;
-    min-height: 34px;
-    padding: 5px 8px;
-    color: var(--paper-light);
-    text-align: left;
-    background: linear-gradient(var(--green-light) 0 48%, var(--green-dark) 48%), var(--green-dark);
-    border: 0;
-    border-bottom: 2px solid var(--ink);
-    box-shadow: inset 2px 2px 0 #f0904c, inset -2px -2px 0 #3a0d07;
-  }
-
-  .menu-bars {
-    display: grid;
-    gap: 3px;
-    width: 18px;
-  }
-
-  .menu-bars i {
-    display: block;
-    height: 2px;
-    background: var(--paper-light);
-    box-shadow: 1px 1px 0 #3a0d07;
-  }
-
   .mobile-menu {
-    display: none;
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 3px;
     padding: 4px;
   }
 
-  .mobile-menu.open {
-    display: grid;
+  .mobile-menu button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 
   .mobile-menu button,
@@ -4801,7 +4773,7 @@ fieldset input,
   }
 
   .tokenomics-table td:first-child {
-    width: 35%;
+    width: 31%;
   }
 
   .tokenomics-table td:nth-child(2) {
@@ -4810,8 +4782,10 @@ fieldset input,
   }
 
   .tokenomics-table td:last-child {
-    width: 44px;
-    font-size: 13px;
+    width: 72px;
+    font-size: 12px;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
   }
 
   .flywheel-console {
@@ -5255,16 +5229,16 @@ fieldset input,
 .app-shell-intro-ready .home-typed-headline .home-typed-line-one {
   border-color: #ffb05a;
   animation:
-    home-headline-type-one 1.7s steps(24, end) 0.28s forwards,
+    home-headline-type-one 1.2s steps(16, end) 0.28s forwards,
     home-headline-caret 0.62s steps(1, end) 0.28s infinite,
-    home-headline-caret-stop 0.01s linear 1.98s forwards;
+    home-headline-caret-stop 0.01s linear 1.48s forwards;
 }
 
 .app-shell-intro-ready .home-typed-headline .home-typed-line-two {
   border-color: #ffb05a;
   animation:
-    home-headline-type-two 0.82s steps(11, end) 1.98s forwards,
-    home-headline-caret 0.62s steps(1, end) 1.98s infinite;
+    home-headline-type-two 1s steps(19, end) 1.48s forwards,
+    home-headline-caret 0.62s steps(1, end) 1.48s infinite;
 }
 
 .protocol-hero-copy p {
@@ -5345,6 +5319,19 @@ fieldset input,
 
 .protocol-stats {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.home-page .protocol-stats .stat-panel {
+  display: grid;
+  grid-template-rows: minmax(34px, auto) 1fr auto;
+}
+
+.home-page .protocol-stats .stat-label {
+  align-self: start;
+}
+
+.home-page .protocol-stats .stat-value {
+  align-self: end;
 }
 
 .protocol-intro,
@@ -5610,6 +5597,7 @@ fieldset input,
 }
 
 .documentation-tabs {
+  flex-wrap: wrap;
   margin: 0 0 10px;
 }
 
@@ -5725,7 +5713,7 @@ fieldset input,
   }
 
   .side-nav {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 4px;
     padding: 5px;
     box-shadow: none;
@@ -6090,7 +6078,7 @@ body,
 @media (max-width: 640px) {
   .ticker {
     padding: 3px 5px;
-    font-size: 7.5px;
+    font-size: 7px;
     letter-spacing: 0;
     line-height: 1;
     text-overflow: clip;
@@ -6236,6 +6224,10 @@ body,
     font-size: clamp(17px, 5.4vw, 25px);
   }
 
+  .dashboard-docs .documentation-typed {
+    font-size: clamp(10px, 3.15vw, 13px);
+  }
+
   .dashboard-docs .documentation-hero p,
   .dashboard-docs .documentation-reader-summary p,
   .dashboard-token .token-locked-placeholder p {
@@ -6269,16 +6261,16 @@ body,
 
 .dashboard-docs .documentation-typed .documentation-typed-line-one {
   animation:
-    documentation-type-one 1.55s steps(36, end) 0.2s forwards,
+    documentation-type-one 1.25s steps(27, end) 0.2s forwards,
     documentation-caret 0.62s steps(1, end) 0.2s infinite,
-    documentation-caret-stop 0.01s linear 1.75s forwards;
+    documentation-caret-stop 0.01s linear 1.45s forwards;
 }
 
 .dashboard-docs .documentation-typed .documentation-typed-line-two {
   border-color: transparent;
   animation:
-    documentation-type-two 1s steps(22, end) 1.75s forwards,
-    documentation-caret 0.62s steps(1, end) 1.75s infinite;
+    documentation-type-two 1.25s steps(31, end) 1.45s forwards,
+    documentation-caret 0.62s steps(1, end) 1.45s infinite;
 }
 
 .dashboard-token .wallet-required-typed .wallet-required-line-one {
@@ -6296,11 +6288,11 @@ body,
 }
 
 @keyframes documentation-type-one {
-  to { width: 36ch; }
+  to { width: 27ch; }
 }
 
 @keyframes documentation-type-two {
-  to { width: 22ch; }
+  to { width: 31ch; }
 }
 
 @keyframes wallet-required-type-one {
@@ -6367,6 +6359,10 @@ body,
     font-size: clamp(21px, 7vw, 30px);
   }
 
+  .home-page .home-typed-headline {
+    font-size: clamp(22px, 7.2vw, 29px);
+  }
+
   .dashboard-token .portfolio-strip strong,
   .dashboard-token .split-list strong,
   .dashboard-token .tokenomics-footer strong {
@@ -6374,7 +6370,7 @@ body,
   }
 }
 
-.dashboard-token.token-number-typing .stat-panel:not(.is-loading) .stat-value {
+.dashboard-token.token-number-typing .stat-panel:not(.is-loading):not(.is-unavailable) .stat-value {
   --token-number-delay: 0.08s;
   position: relative;
   display: block;
@@ -6387,7 +6383,7 @@ body,
   animation-delay: var(--token-number-delay);
 }
 
-.dashboard-token.token-number-typing .stat-panel:not(.is-loading) .stat-value::after {
+.dashboard-token.token-number-typing .stat-panel:not(.is-loading):not(.is-unavailable) .stat-value::after {
   content: "";
   position: absolute;
   top: 0.08em;

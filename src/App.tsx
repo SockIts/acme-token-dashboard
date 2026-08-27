@@ -94,6 +94,7 @@ type TabKey = 'invest' | 'portfolio' | 'programs' | 'reports' | 'manifesto'
 type DeskMode = 'mint' | 'stake' | 'dex'
 const INTRO_DURATION_MS = 3200
 const INTRO_PREF_KEY = 'acme-dashboard-skip-intro'
+const UNAVAILABLE_VALUE = '- -'
 
 const NAV_ITEMS = [
   ['invest', 'Invest'],
@@ -137,6 +138,20 @@ const DOCUMENTS = [
     kind: 'Runtime spec',
     href: publicAsset('Documentation/ACME-RUNTIME.pdf'),
     summary: 'Reference material for ACME runtime behavior, programmable assets, and creator-facing execution.',
+  },
+  {
+    key: 'cortex-network',
+    title: 'Cortex Neural Art Network',
+    kind: 'Network paper',
+    href: publicAsset('Documentation/Cortex_Neural_Art_Network.pdf'),
+    summary: 'Cortex network reference for neural art workflows, creative graphing, and protocol-aware media systems.',
+  },
+  {
+    key: 'backend-docker',
+    title: 'Backend Docker Deployment',
+    kind: 'Deployment guide',
+    href: publicAsset('Documentation/ACME_Backend_Docker_Deployment_2026-07-05.pdf'),
+    summary: 'Docker deployment reference for ACME backend services, runtime setup, and infrastructure operations.',
   },
 ] as const
 
@@ -231,7 +246,7 @@ interface AcmeContext {
 }
 
 function formatNumber(value: number | null | undefined, decimals = 0): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return '--'
+  if (value === null || value === undefined || Number.isNaN(value)) return UNAVAILABLE_VALUE
   return value.toLocaleString(undefined, { maximumFractionDigits: decimals })
 }
 
@@ -264,12 +279,12 @@ function getShareholderTier(balance: number): ShareholderTier {
 }
 
 function formatSats(value: number | null | undefined): string {
-  if (value === null || value === undefined) return '--'
+  if (value === null || value === undefined) return UNAVAILABLE_VALUE
   return value >= SCALE ? `${formatNumber(value / SCALE, 8)} BTC` : `${formatNumber(value)} sats`
 }
 
 function formatUsd(value: number | null | undefined, decimals = 0): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return '--'
+  if (value === null || value === undefined || Number.isNaN(value)) return UNAVAILABLE_VALUE
   return value.toLocaleString(undefined, {
     style: 'currency',
     currency: 'USD',
@@ -282,28 +297,28 @@ function getVolumePhaseNote(fills: number | null | undefined): string {
 }
 
 function shortAddress(address: string | null | undefined): string {
-  if (!address) return '--'
+  if (!address) return UNAVAILABLE_VALUE
   return address.length > 18 ? `${address.slice(0, 8)}...${address.slice(-6)}` : address
 }
 
 function shortHash(hash: string | null | undefined): string {
-  if (!hash) return '--'
+  if (!hash) return UNAVAILABLE_VALUE
   return hash.length > 14 ? `${hash.slice(0, 6)}...${hash.slice(-6)}` : hash
 }
 
 function formatAcmeRaw(quantity: number | null | undefined): string {
-  if (quantity === null || quantity === undefined) return '--'
+  if (quantity === null || quantity === undefined) return UNAVAILABLE_VALUE
   return `${formatNumber(quantity / SCALE, 8)} ACME`
 }
 
 function formatTokenPercent(quantity: number, supplyRaw: number | null | undefined): string {
-  if (!supplyRaw || supplyRaw <= 0) return '--'
+  if (!supplyRaw || supplyRaw <= 0) return UNAVAILABLE_VALUE
   return `${formatNumber((quantity / supplyRaw) * 100, 4)}%`
 }
 
 function formatUnitPrice(order: AtomicOrder): string {
   const quantityWhole = order.quantity / SCALE
-  if (quantityWhole <= 0) return '--'
+  if (quantityWhole <= 0) return UNAVAILABLE_VALUE
   return formatSats(order.btc_price / quantityWhole)
 }
 
@@ -380,7 +395,7 @@ function IntroAnimation({ onComplete, onDisable }: { onComplete: () => void; onD
 
 function StatPanel({ label, value, help, loading = false }: { label: string; value: string; help: string; loading?: boolean }) {
   return (
-    <section className={`panel stat-panel ${loading ? 'is-loading' : ''}`}>
+    <section className={`panel stat-panel ${loading ? 'is-loading' : ''} ${value === UNAVAILABLE_VALUE ? 'is-unavailable' : ''}`}>
       <div className="stat-label">{label}</div>
       <div className="stat-value">{loading ? <span className="skeleton-line" /> : value}</div>
       <div className="stat-help">{help}</div>
@@ -683,8 +698,8 @@ function HomePage({ ctx, onOpenTokenDashboard, onOpenMintDashboard }: { ctx: Acm
         <div className="protocol-hero-copy">
           <span>Bitcoin-Native Meta Protocol</span>
           <h2 className="home-typed-headline">
-            <span className="home-typed-line-one">Assets that live forever</span>
-            <span className="home-typed-line-two">on Bitcoin.</span>
+            <span className="home-typed-line-one">Assets that live</span>
+            <span className="home-typed-line-two">forever on Bitcoin.</span>
           </h2>
           <p>ACME — Assets Coded on the Monetary Engine — solves fragmentation, verifiability, and permanence for digital assets on Bitcoin. Built for artists and developers who refuse to compromise.</p>
           <div className="protocol-actions">
@@ -820,8 +835,8 @@ function DocumentationPage() {
         <div className="documentation-hero">
           <span>Reference Shelf</span>
           <h2 className="documentation-typed">
-            <span className="documentation-typed-line-one">Protocol docs for builders, artists,</span>
-            <span className="documentation-typed-line-two">traders, and indexers.</span>
+            <span className="documentation-typed-line-one">Protocol docs for builders,</span>
+            <span className="documentation-typed-line-two">artists, traders, and indexers.</span>
           </h2>
           <p>Read the current ACME references inside the dashboard: Cortex usage, atomic swaps, runtime behavior, and the routing architecture that connects fees back to protocol services.</p>
         </div>
@@ -909,7 +924,7 @@ function TokenLockedPage({ ctx }: { ctx: AcmeContext }) {
             <tr><td>Supply issued</td><td>{formatNumber(ctx.supplyWhole, 8)} ACME</td><td>{formatNumber(ctx.progress, 2)}%</td></tr>
             <tr><td>Mint capacity left</td><td>{formatOpenMinterQuantity(ctx.remainingRaw, true)} ACME</td><td>{formatNumber(100 - ctx.progress, 2)}%</td></tr>
             <tr><td>Open listings</td><td>{formatNumber(ctx.stats?.open_listings_count)}</td><td>DEX</td></tr>
-            <tr><td>Mint price</td><td>{ctx.pricing?.pricingRatio ?? '--'}</td><td>{ctx.pricing?.pricePerToken ?? 'openminter'}</td></tr>
+            <tr><td>Mint price</td><td>{ctx.pricing?.pricingRatio ?? UNAVAILABLE_VALUE}</td><td>{ctx.pricing?.pricePerToken ?? 'openminter'}</td></tr>
             <tr><td>Indexer block</td><td>{formatNumber(ctx.stats?.as_of_block)}</td><td>Live feed</td></tr>
           </tbody>
         </table>
@@ -928,7 +943,7 @@ function InvestPage({ ctx }: { ctx: AcmeContext }) {
   return (
     <>
       <div className="hero-metrics">
-        <StatPanel label="ACME PRICE" value={ctx.pricing?.pricingRatio ?? '--'} help={ctx.pricing?.pricePerToken ?? 'active openminter pricing'} loading={ctx.minterLoading} />
+        <StatPanel label="ACME PRICE" value={ctx.pricing?.pricingRatio ?? UNAVAILABLE_VALUE} help={ctx.pricing?.pricePerToken ?? 'active openminter pricing'} loading={ctx.minterLoading} />
         <StatPanel label="MINT CAPACITY" value={`${formatOpenMinterQuantity(ctx.remainingRaw, true)} ACME`} help="unissued supply available through the openminter" loading={ctx.minterLoading} />
         <StatPanel label="CIRC MARKET CAP" value={formatUsd(circulatingMarketCapUsd)} help={`${formatNumber(circulatingPercent, 2)}% of fixed supply circulating at the 1 sat mint price`} loading={ctx.statsLoading || ctx.marketLoading} />
       </div>
@@ -939,7 +954,7 @@ function InvestPage({ ctx }: { ctx: AcmeContext }) {
 
       <div className="portfolio-strip">
         <div className={ctx.balancesLoading ? 'is-loading' : ''}><span>HELD</span><strong>{ctx.balancesLoading ? <span className="skeleton-line" /> : `${formatNumber(ctx.walletAcmeWhole, 8)} ACME`}</strong><small>connected wallet balance</small></div>
-        <div className={ctx.minterLoading ? 'is-loading' : ''}><span>MINTABLE NOW</span><strong>{ctx.minterLoading ? <span className="skeleton-line" /> : `${ctx.minter ? formatOpenMinterQuantity(ctx.maxRaw, true) : '--'} ACME`}</strong><small>per tx, supply and wallet cap aware</small></div>
+        <div className={ctx.minterLoading ? 'is-loading' : ''}><span>MINTABLE NOW</span><strong>{ctx.minterLoading ? <span className="skeleton-line" /> : `${ctx.minter ? formatOpenMinterQuantity(ctx.maxRaw, true) : UNAVAILABLE_VALUE} ACME`}</strong><small>per tx, supply and wallet cap aware</small></div>
         <div className={ctx.statsLoading ? 'is-loading' : ''}><span>MARKET FLOOR</span><strong>{ctx.statsLoading ? <span className="skeleton-line" /> : formatSats(ctx.stats?.floor_price_sats)}</strong><small>lowest DEX listing</small></div>
       </div>
 
@@ -986,13 +1001,13 @@ function PortfolioPage({ ctx }: { ctx: AcmeContext }) {
         <div className="hero-metrics">
           <StatPanel label="TOKEN BALANCE" value={`${formatNumber(ctx.walletAcmeWhole, 8)} ACME`} help="from /addresses/:address/balances" />
           <StatPanel label="LAST PRICE" value={formatSats(ctx.stats?.last_price_sats)} help="latest indexed fill price" />
-          <StatPanel label="FLOOR VALUE" value={ctx.stats?.floor_price_sats ? formatSats(Math.floor(ctx.walletAcmeWhole * ctx.stats.floor_price_sats)) : '--'} help="rough mark using current floor" />
+          <StatPanel label="FLOOR VALUE" value={ctx.stats?.floor_price_sats ? formatSats(Math.floor(ctx.walletAcmeWhole * ctx.stats.floor_price_sats)) : UNAVAILABLE_VALUE} help="rough mark using current floor" />
         </div>
         <div className="portfolio-notes">
           <p>ACME is the account’s working token for the ACME ecosystem. This Portfolio page is now focused on custody, balances, staking readiness, and position tracking. Minting remains available from the Invest desk.</p>
           <table>
             <tbody>
-              <tr><td>Owner</td><td className="mono">{ctx.stats?.owner ?? '--'}</td></tr>
+              <tr><td>Owner</td><td className="mono">{ctx.stats?.owner ?? UNAVAILABLE_VALUE}</td></tr>
               <tr><td>Circulating supply</td><td>{formatNumber(ctx.supplyWhole, 8)} / {formatNumber(TOTAL_SUPPLY)} ACME</td></tr>
               <tr><td>Deploy block</td><td>{formatNumber(ctx.stats?.deploy_block)}</td></tr>
             </tbody>
@@ -1010,7 +1025,7 @@ function PortfolioPage({ ctx }: { ctx: AcmeContext }) {
               <tr key={amount}>
                 <td>{formatNumber(amount)} ACME</td>
                 <td>{formatNumber(amount, 8)} ACME</td>
-                <td>{ctx.stats?.floor_price_sats ? formatSats(amount * ctx.stats.floor_price_sats) : '--'}</td>
+                <td>{ctx.stats?.floor_price_sats ? formatSats(amount * ctx.stats.floor_price_sats) : UNAVAILABLE_VALUE}</td>
               </tr>
             ))}
           </tbody>
@@ -1042,7 +1057,7 @@ function StakingDesk({ ctx }: { ctx: AcmeContext }) {
         <div className="hero-metrics">
           <StatPanel label="POOL" value={ctx.stakingLoading ? 'Loading' : ctx.stakingPool ? 'Online' : 'Unavailable'} help="staking pool endpoint status" />
           <StatPanel label="ACTIVE STAKE" value={`${formatAcmeQuantity(poolStake, { compact: true })} ACME`} help="total pool stake, if available" />
-          <StatPanel label="EPOCH" value={currentEpoch === null ? '--' : formatNumber(currentEpoch)} help={`${STAKING_EPOCH_BLOCKS} blocks per staking epoch`} />
+          <StatPanel label="EPOCH" value={currentEpoch === null ? UNAVAILABLE_VALUE : formatNumber(currentEpoch)} help={`${STAKING_EPOCH_BLOCKS} blocks per staking epoch`} />
         </div>
         <div className="dual-forms">
           <fieldset>
@@ -1274,9 +1289,9 @@ function ReportsPage({ ctx }: { ctx: AcmeContext }) {
           <StatPanel label="FDV USD" value={formatUsd(fdvUsd)} help="1B ACME x 1 sat mint value x BTC/USD" loading={ctx.marketLoading} />
           <StatPanel label="24H VOLUME" value={formatSats(ctx.stats?.volume_24h_sats)} help={getVolumePhaseNote(ctx.stats?.fills_24h_count)} loading={ctx.statsLoading} />
           <StatPanel label="HOLDERS" value={formatNumber(ctx.stats?.holder_count)} help="unique indexed token holders" loading={ctx.statsLoading} />
-          <StatPanel label="HARD CAP" value={ctx.capWhole ? `${formatNumber(ctx.capWhole, 8)} ACME` : '--'} help="maximum distributable mint supply" loading={ctx.minterLoading} />
-          <StatPanel label="MAX PER TX" value={ctx.minter ? `${formatOpenMinterQuantity(ctx.minter.max_mint_per_tx, true)} ACME` : '--'} help="largest quantity the minter allows per transaction" loading={ctx.minterLoading} />
-          <StatPanel label="PRICE" value={ctx.pricing?.pricingRatio ?? '--'} help={ctx.pricing?.pricePerToken ?? 'openminter unavailable'} loading={ctx.minterLoading} />
+          <StatPanel label="HARD CAP" value={ctx.capWhole ? `${formatNumber(ctx.capWhole, 8)} ACME` : UNAVAILABLE_VALUE} help="maximum distributable mint supply" loading={ctx.minterLoading} />
+          <StatPanel label="MAX PER TX" value={ctx.minter ? `${formatOpenMinterQuantity(ctx.minter.max_mint_per_tx, true)} ACME` : UNAVAILABLE_VALUE} help="largest quantity the minter allows per transaction" loading={ctx.minterLoading} />
+          <StatPanel label="PRICE" value={ctx.pricing?.pricingRatio ?? UNAVAILABLE_VALUE} help={ctx.pricing?.pricePerToken ?? 'openminter unavailable'} loading={ctx.minterLoading} />
           <StatPanel label="AS OF BLOCK" value={formatNumber(ctx.stats?.as_of_block)} help="indexer block for this report" loading={ctx.statsLoading} />
         </div>
       </WindowPanel>
@@ -1290,7 +1305,7 @@ function ReportsPage({ ctx }: { ctx: AcmeContext }) {
               <tr><td>Supply issued</td><td>{formatNumber(ctx.supplyWhole, 8)} ACME</td><td>{formatNumber(ctx.progress, 2)}%</td></tr>
               <tr><td>Mint capacity left</td><td>{formatOpenMinterQuantity(ctx.remainingRaw, true)} ACME</td><td>{formatNumber(100 - ctx.progress, 2)}%</td></tr>
               <tr><td>Open listings</td><td>{formatNumber(ctx.stats?.open_listings_count)}</td><td>DEX</td></tr>
-              <tr><td>Owner</td><td className="mono">{ctx.stats?.owner ?? '--'}</td><td>{ctx.stats?.locked ? 'Locked' : 'Unlocked'}</td></tr>
+              <tr><td>Owner</td><td className="mono">{ctx.stats?.owner ?? UNAVAILABLE_VALUE}</td><td>{ctx.stats?.locked ? 'Locked' : 'Unlocked'}</td></tr>
             </tbody>
           </table>
         </WindowPanel>
@@ -1299,8 +1314,8 @@ function ReportsPage({ ctx }: { ctx: AcmeContext }) {
           <table>
             <tbody>
               <tr><td>Shares outstanding</td><td>{formatNumber(ctx.supplyWhole, 8)} ACME</td></tr>
-              <tr><td>Hard cap</td><td>{ctx.capWhole ? `${formatNumber(ctx.capWhole, 8)} ACME` : '--'}</td></tr>
-              <tr><td>Minimum mint price</td><td>{ctx.pricing?.pricingRatio ?? '--'}</td></tr>
+              <tr><td>Hard cap</td><td>{ctx.capWhole ? `${formatNumber(ctx.capWhole, 8)} ACME` : UNAVAILABLE_VALUE}</td></tr>
+              <tr><td>Minimum mint price</td><td>{ctx.pricing?.pricingRatio ?? UNAVAILABLE_VALUE}</td></tr>
               <tr><td>Floor listing</td><td>{formatSats(ctx.stats?.floor_price_sats)}</td></tr>
             </tbody>
           </table>
@@ -1549,7 +1564,7 @@ function TokenomicsPanel({ ctx }: { ctx: AcmeContext }) {
         <div><strong>2 years</strong><span>Team reserve lock</span></div>
         <div><strong>{STAKING_EPOCH_BLOCKS} blocks</strong><span>Staking epoch</span></div>
         <div><strong>{formatNumber(mintedPublicPercent, 2)}%</strong><span>Public mint progress toward 30%</span></div>
-        <div><strong>{ctx.capWhole ? formatNumber(ctx.capWhole, 0) : '--'} ACME</strong><span>Indexed mint cap</span></div>
+        <div><strong>{ctx.capWhole ? formatNumber(ctx.capWhole, 0) : UNAVAILABLE_VALUE} ACME</strong><span>Indexed mint cap</span></div>
       </div>
     </WindowPanel>
   )
@@ -1572,7 +1587,6 @@ export default function App() {
   const [introVisible, setIntroVisible] = useState(shouldShowIntro)
   const [activeAppPage, setActiveAppPage] = useState<AppPage>('home')
   const [activeTab, setActiveTab] = useState<TabKey>('invest')
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [quantity, setQuantity] = useState(String(MIN_MINT_ACME))
   const [feeRate, setFeeRate] = useState(5)
   const [mintStatus, setMintStatus] = useState<MintStatus>('idle')
@@ -1734,11 +1748,6 @@ export default function App() {
     setIntroEnabled(false)
     setIntroVisible(false)
   }
-  const handleReplayIntro = () => {
-    window.localStorage.removeItem(INTRO_PREF_KEY)
-    setIntroEnabled(true)
-    setIntroVisible(true)
-  }
 
   const handleMint = async () => {
     if (!wallet.address || !minter) return
@@ -1807,10 +1816,10 @@ export default function App() {
     marketplaceOrders: marketplaceOrdersQuery.data?.result ?? [],
     reportLoading: holdersQuery.isLoading || sendsQuery.isLoading || listingsQuery.isLoading,
     marketplaceLoading: marketplaceOrdersQuery.isLoading,
-    statsLoading: statsQuery.isLoading,
-    minterLoading: minterQuery.isLoading,
-    balancesLoading: balancesQuery.isLoading,
-    marketLoading: bitcoinUsdQuery.isLoading,
+    statsLoading: statsQuery.isLoading && !statsQuery.isError,
+    minterLoading: minterQuery.isLoading && !minterQuery.isError,
+    balancesLoading: balancesQuery.isLoading && !balancesQuery.isError,
+    marketLoading: bitcoinUsdQuery.isLoading && !bitcoinUsdQuery.isError,
     pricing,
     quantity,
     setQuantity,
@@ -1858,10 +1867,6 @@ export default function App() {
               <i className="nav-status" aria-hidden="true" />
               <span>Documentation</span>
             </button>
-            <button type="button" className="intro-replay-button" onClick={handleReplayIntro}>
-              <i className="nav-status nav-status-muted" aria-hidden="true" />
-              <span>Replay Intro</span>
-            </button>
             <div className="mobile-nav-wallet" aria-label="Wallet connection">
               <WalletPicker label="Connect" menuId="mobile-wallet-provider-menu" />
             </div>
@@ -1874,7 +1879,7 @@ export default function App() {
         </div>
 
         <main className={`dashboard dashboard-${activeAppPage} ${tokenNumberTypingActive ? 'token-number-typing' : ''}`}>
-          <div className="ticker">ACME IS LIVE · ART CODED ON THE MONETARY ENGINE · TOKEN MINT TERMINAL · {formatFreshness(liveUpdatedAt)}</div>
+          <div className="ticker">ACME LIVE · TOKEN TERMINAL · {formatFreshness(liveUpdatedAt)}</div>
           <header className="masthead">
             <div>
               <h1>{activeAppPage === 'home' ? 'ACME Protocol' : activeAppPage === 'docs' ? 'Documentation' : 'ACME Token Dashboard'}</h1>
@@ -1893,26 +1898,13 @@ export default function App() {
             </nav>
 
             <nav className="mobile-nav" aria-label="Mobile page navigation">
-              <button
-                type="button"
-                className="mobile-menu-toggle"
-                aria-expanded={mobileMenuOpen}
-                aria-controls="mobile-page-menu"
-                onClick={() => setMobileMenuOpen((value) => !value)}
-              >
-                <span className="menu-bars" aria-hidden="true"><i /><i /><i /></span>
-                <strong>{NAV_ITEMS.find(([key]) => key === activeTab)?.[1]}</strong>
-              </button>
-              <div id="mobile-page-menu" className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+              <div className="mobile-menu">
                 {NAV_ITEMS.map(([key, label]) => (
                   <button
                     key={key}
                     type="button"
                     className={activeTab === key ? 'active' : ''}
-                    onClick={() => {
-                      setActiveTab(key)
-                      setMobileMenuOpen(false)
-                    }}
+                    onClick={() => setActiveTab(key)}
                   >
                     {label}
                   </button>
