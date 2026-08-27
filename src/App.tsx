@@ -94,6 +94,7 @@ type TabKey = 'invest' | 'portfolio' | 'programs' | 'reports' | 'manifesto'
 type DeskMode = 'mint' | 'stake' | 'dex'
 const INTRO_DURATION_MS = 3200
 const INTRO_PREF_KEY = 'acme-dashboard-skip-intro'
+const ACME_MODE_PREF_KEY = 'acme-dashboard-acme-mode'
 const UNAVAILABLE_VALUE = '- -'
 
 const NAV_ITEMS = [
@@ -264,6 +265,10 @@ function shouldShowIntro(): boolean {
   return typeof window === 'undefined' ? true : window.localStorage.getItem(INTRO_PREF_KEY) !== 'true'
 }
 
+function shouldUseAcmeMode(): boolean {
+  return typeof window === 'undefined' ? false : window.localStorage.getItem(ACME_MODE_PREF_KEY) === 'true'
+}
+
 function formatFreshness(updatedAt: number): string {
   if (!updatedAt) return 'Waiting for live data'
   const elapsedSeconds = Math.max(0, Math.round((Date.now() - updatedAt) / 1000))
@@ -390,6 +395,20 @@ function IntroAnimation({ onComplete, onDisable }: { onComplete: () => void; onD
         <button type="button" onClick={onDisable}>Don't show again</button>
       </div>
     </div>
+  )
+}
+
+function AcmeModeToggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      className={`acme-mode-toggle ${enabled ? 'active' : ''}`}
+      onClick={onToggle}
+      aria-pressed={enabled}
+    >
+      <span>ACME Mode</span>
+      <strong>{enabled ? 'Night' : 'Day'}</strong>
+    </button>
   )
 }
 
@@ -1592,6 +1611,8 @@ export default function App() {
   const [mintStatus, setMintStatus] = useState<MintStatus>('idle')
   const [mintMessage, setMintMessage] = useState<string | null>(null)
   const [txid, setTxid] = useState<string | null>(null)
+  const [acmeModeEnabled, setAcmeModeEnabled] = useState(shouldUseAcmeMode)
+  const [themeGlitching, setThemeGlitching] = useState(false)
   const [tokenNumberTypingActive, setTokenNumberTypingActive] = useState(false)
   const [tokenNumberTypingCompleteKey, setTokenNumberTypingCompleteKey] = useState<string | null>(null)
 
@@ -1687,6 +1708,17 @@ export default function App() {
     if (feesQuery.data?.halfHourFee) setFeeRate(feesQuery.data.halfHourFee)
   }, [feesQuery.data?.halfHourFee])
 
+  useEffect(() => {
+    window.localStorage.setItem(ACME_MODE_PREF_KEY, acmeModeEnabled ? 'true' : 'false')
+    document.documentElement.classList.toggle('acme-night-root', acmeModeEnabled)
+  }, [acmeModeEnabled])
+
+  useEffect(() => {
+    if (!themeGlitching) return
+    const timer = window.setTimeout(() => setThemeGlitching(false), 760)
+    return () => window.clearTimeout(timer)
+  }, [themeGlitching])
+
   const stats = statsQuery.data?.result
   const minter = useMemo<OpenMinter | null>(() => {
     return (minterQuery.data?.result ?? []).find(
@@ -1747,6 +1779,10 @@ export default function App() {
     window.localStorage.setItem(INTRO_PREF_KEY, 'true')
     setIntroEnabled(false)
     setIntroVisible(false)
+  }
+  const handleToggleAcmeMode = () => {
+    setThemeGlitching(true)
+    setAcmeModeEnabled((current) => !current)
   }
 
   const handleMint = async () => {
@@ -1848,7 +1884,7 @@ export default function App() {
   return (
     <>
       {introEnabled && introVisible && <IntroAnimation onComplete={handleSkipIntro} onDisable={handleDisableIntro} />}
-      <div className={`app-shell ${introVisible ? 'app-shell-intro-pending' : 'app-shell-intro-ready'}`}>
+      <div className={`app-shell ${introVisible ? 'app-shell-intro-pending' : 'app-shell-intro-ready'} ${acmeModeEnabled ? 'acme-night-mode' : ''} ${themeGlitching ? 'theme-glitching' : ''}`}>
         <div className="side-column">
           <aside className="side-nav" aria-label="ACME navigation">
             <div className="side-brand">
@@ -1867,6 +1903,9 @@ export default function App() {
               <i className="nav-status" aria-hidden="true" />
               <span>Documentation</span>
             </button>
+            <div className="mobile-acme-mode">
+              <AcmeModeToggle enabled={acmeModeEnabled} onToggle={handleToggleAcmeMode} />
+            </div>
             <div className="mobile-nav-wallet" aria-label="Wallet connection">
               <WalletPicker label="Connect" menuId="mobile-wallet-provider-menu" />
             </div>
@@ -1875,6 +1914,7 @@ export default function App() {
           <div className="side-wallet" aria-label="Wallet connection">
             <span>Wallet</span>
             <WalletPicker />
+            <AcmeModeToggle enabled={acmeModeEnabled} onToggle={handleToggleAcmeMode} />
           </div>
         </div>
 

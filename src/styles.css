@@ -5713,7 +5713,7 @@ fieldset input,
   }
 
   .side-nav {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 34px;
     gap: 4px;
     padding: 5px;
     box-shadow: none;
@@ -6436,4 +6436,640 @@ body,
 
 @keyframes token-number-caret-hide {
   to { opacity: 0; }
+}
+
+.acme-mode-toggle {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  width: 100%;
+  padding: 7px 8px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: uppercase;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: inset 2px 2px 0 var(--paper-light), inset -2px -2px 0 var(--paper-dark), 2px 2px 0 rgba(2, 5, 3, 0.5);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.acme-mode-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 4px auto 4px 4px;
+  width: 5px;
+  background: #9b8064;
+  border: 1px solid var(--ink);
+}
+
+.acme-mode-toggle span {
+  min-width: 0;
+  padding-left: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acme-mode-toggle strong {
+  padding: 2px 5px;
+  color: #fff0dc;
+  font-size: 9px;
+  line-height: 1;
+  background: var(--green-dark);
+  border: 1px solid var(--ink);
+}
+
+.acme-mode-toggle.active {
+  color: #dfffe8;
+  background:
+    repeating-linear-gradient(90deg, rgba(42, 255, 133, 0.13) 0 1px, transparent 1px 8px),
+    #06170c;
+  border-color: #2cff82;
+  box-shadow:
+    inset 0 0 0 1px rgba(186, 255, 210, 0.16),
+    0 0 16px rgba(18, 255, 113, 0.22);
+  text-shadow: 0 0 6px rgba(42, 255, 133, 0.72);
+}
+
+.acme-mode-toggle.active::before {
+  background: #2cff82;
+  border-color: #dfffe8;
+  box-shadow: 0 0 12px rgba(42, 255, 133, 0.9);
+}
+
+.acme-mode-toggle.active strong {
+  color: #031107;
+  background: #2cff82;
+  border-color: #dfffe8;
+  text-shadow: none;
+}
+
+.mobile-acme-mode {
+  display: none;
+}
+
+.acme-night-root,
+.acme-night-root body,
+.acme-night-root #root {
+  background:
+    radial-gradient(circle at 70% -20%, rgba(44, 255, 130, 0.16), transparent 30rem),
+    linear-gradient(rgba(44, 255, 130, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44, 255, 130, 0.026) 1px, transparent 1px),
+    #010604;
+}
+
+.app-shell.acme-night-mode {
+  --paper: #06170c;
+  --paper-light: #0d2f18;
+  --paper-mid: #092012;
+  --paper-dark: #020804;
+  --ink: #dfffe8;
+  --terminal: #010604;
+  --terminal-2: #041108;
+  --green: #2cff82;
+  --green-dim: #14a854;
+  --green-dark: #2cff82;
+  --amber: #d6ff74;
+  --shadow: rgba(0, 0, 0, 0.9);
+  color: #dfffe8;
+  background:
+    repeating-linear-gradient(0deg, rgba(44, 255, 130, 0.06) 0 1px, transparent 1px 4px),
+    radial-gradient(circle at 68% 12%, rgba(44, 255, 130, 0.14), transparent 24rem),
+    #010604;
+}
+
+.app-shell.acme-night-mode::before,
+.app-shell.acme-night-mode::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  pointer-events: none;
+}
+
+.app-shell.acme-night-mode::before {
+  opacity: 0.2;
+  background:
+    repeating-linear-gradient(90deg, rgba(44, 255, 130, 0.18) 0 1px, transparent 1px 14px),
+    repeating-linear-gradient(0deg, transparent 0 16px, rgba(44, 255, 130, 0.1) 16px 17px);
+  mix-blend-mode: screen;
+}
+
+.app-shell.acme-night-mode::after {
+  opacity: 0.34;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0 1px, transparent 1px 3px);
+}
+
+.app-shell.acme-night-mode .dashboard,
+.app-shell.acme-night-mode .side-column,
+.app-shell.acme-night-mode .side-wallet,
+.app-shell.acme-night-mode .ticker,
+.app-shell.acme-night-mode .tabs,
+.app-shell.acme-night-mode .window,
+.app-shell.acme-night-mode .window-body,
+.app-shell.acme-night-mode .panel,
+.app-shell.acme-night-mode .portfolio-strip div,
+.app-shell.acme-night-mode .split-list li,
+.app-shell.acme-night-mode .tokenomics-footer div,
+.app-shell.acme-night-mode table,
+.app-shell.acme-night-mode td,
+.app-shell.acme-night-mode th,
+.app-shell.acme-night-mode .report-table,
+.app-shell.acme-night-mode .listing-grid section,
+.app-shell.acme-night-mode .desk-listings,
+.app-shell.acme-night-mode .documentation-reader-summary,
+.app-shell.acme-night-mode .documentation-hero,
+.app-shell.acme-night-mode .token-locked-placeholder,
+.app-shell.acme-night-mode .protocol-proof,
+.app-shell.acme-night-mode .protocol-intro,
+.app-shell.acme-night-mode .protocol-feature-layout,
+.app-shell.acme-night-mode .protocol-market,
+.app-shell.acme-night-mode .protocol-cta,
+.app-shell.acme-night-mode .protocol-card,
+.app-shell.acme-night-mode .protocol-feature-grid article,
+.app-shell.acme-night-mode .protocol-preview article,
+.app-shell.acme-night-mode .protocol-market-list article,
+.app-shell.acme-night-mode .protocol-team a,
+.app-shell.acme-night-mode .tokenomics-intro,
+.app-shell.acme-night-mode .tokenomics-table,
+.app-shell.acme-night-mode .tokenomics-footer,
+.app-shell.acme-night-mode .protocol-mainnet-card {
+  color: #dfffe8;
+  background:
+    linear-gradient(rgba(44, 255, 130, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44, 255, 130, 0.028) 1px, transparent 1px),
+    #041108;
+  background-size: 7px 7px, 7px 7px, auto;
+  border-color: #177a3c;
+  box-shadow:
+    inset 0 0 0 1px rgba(206, 255, 222, 0.08),
+    0 0 18px rgba(44, 255, 130, 0.14),
+    3px 3px 0 rgba(0, 0, 0, 0.78);
+}
+
+.app-shell.acme-night-mode td,
+.app-shell.acme-night-mode .tokenomics-footer div,
+.app-shell.acme-night-mode .protocol-card,
+.app-shell.acme-night-mode .protocol-feature-grid article,
+.app-shell.acme-night-mode .protocol-mainnet-card {
+  background:
+    linear-gradient(rgba(44, 255, 130, 0.024) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44, 255, 130, 0.018) 1px, transparent 1px),
+    #2c332f;
+  background-size: 8px 8px, 8px 8px, auto;
+}
+
+.app-shell.acme-night-mode th,
+.app-shell.acme-night-mode .listing-grid h3 {
+  color: #d6ff74;
+  background:
+    linear-gradient(rgba(44, 255, 130, 0.04) 1px, transparent 1px),
+    #26352b;
+  border-color: #5f7e68;
+  text-shadow: none;
+}
+
+.app-shell.acme-night-mode .dashboard-token .window,
+.app-shell.acme-night-mode .dashboard-token .window-body,
+.app-shell.acme-night-mode .dashboard-token .panel,
+.app-shell.acme-night-mode .dashboard-token .memo,
+.app-shell.acme-night-mode .dashboard-token .info-grid p,
+.app-shell.acme-night-mode .dashboard-token .portfolio-strip,
+.app-shell.acme-night-mode .dashboard-token .portfolio-strip div,
+.app-shell.acme-night-mode .dashboard-token .portfolio-notes p,
+.app-shell.acme-night-mode .dashboard-token .staking-banner,
+.app-shell.acme-night-mode .dashboard-token .stake-earn,
+.app-shell.acme-night-mode .dashboard-token .stake-details,
+.app-shell.acme-night-mode .dashboard-token .program-list article,
+.app-shell.acme-night-mode .dashboard-token .product-suite,
+.app-shell.acme-night-mode .dashboard-token .product-suite article,
+.app-shell.acme-night-mode .dashboard-token .card-display,
+.app-shell.acme-night-mode .dashboard-token .card-tier-strip,
+.app-shell.acme-night-mode .dashboard-token .tier-choice,
+.app-shell.acme-night-mode .dashboard-token .tier-current-indicator,
+.app-shell.acme-night-mode .dashboard-token .nft-marketplace,
+.app-shell.acme-night-mode .dashboard-token .marketplace-count,
+.app-shell.acme-night-mode .dashboard-token .marketplace-card,
+.app-shell.acme-night-mode .dashboard-token .marketplace-card-body,
+.app-shell.acme-night-mode .dashboard-token .marketplace-footer,
+.app-shell.acme-night-mode .dashboard-token .marketplace-empty,
+.app-shell.acme-night-mode .dashboard-token .flywheel,
+.app-shell.acme-night-mode .dashboard-token .flywheel-core,
+.app-shell.acme-night-mode .dashboard-token .fly-step,
+.app-shell.acme-night-mode .dashboard-token .roadmap-section,
+.app-shell.acme-night-mode .dashboard-token .roadmap-lede,
+.app-shell.acme-night-mode .dashboard-token .roadmap-arc article,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-intro,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-table,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-table td,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-table th,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-footer,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-footer div,
+.app-shell.acme-night-mode .dashboard-token .report-table table,
+.app-shell.acme-night-mode .dashboard-token .report-table td,
+.app-shell.acme-night-mode .dashboard-token .report-table th,
+.app-shell.acme-night-mode .dashboard-token .listing-grid section,
+.app-shell.acme-night-mode .dashboard-token .listing-grid table,
+.app-shell.acme-night-mode .dashboard-token .listing-grid h3,
+.app-shell.acme-night-mode .dashboard-token .listing-grid td,
+.app-shell.acme-night-mode .dashboard-token .listing-grid th,
+.app-shell.acme-night-mode .dashboard-token .desk-listings,
+.app-shell.acme-night-mode .dashboard-token .desk-listings table,
+.app-shell.acme-night-mode .dashboard-token .desk-listings td,
+.app-shell.acme-night-mode .dashboard-token .desk-listings th,
+.app-shell.acme-night-mode .dashboard-token fieldset {
+  color: #e3ffee;
+  background:
+    linear-gradient(rgba(44, 255, 130, 0.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44, 255, 130, 0.02) 1px, transparent 1px),
+    #202622;
+  background-size: 8px 8px, 8px 8px, auto;
+  border-color: #3f5f4b;
+  box-shadow:
+    inset 0 0 0 1px rgba(227, 255, 238, 0.06),
+    2px 2px 0 rgba(0, 0, 0, 0.68);
+}
+
+.app-shell.acme-night-mode .dashboard-token .panel,
+.app-shell.acme-night-mode .dashboard-token .portfolio-strip div,
+.app-shell.acme-night-mode .dashboard-token .stake-earn,
+.app-shell.acme-night-mode .dashboard-token .stake-details,
+.app-shell.acme-night-mode .dashboard-token .program-list article,
+.app-shell.acme-night-mode .dashboard-token .product-suite article,
+.app-shell.acme-night-mode .dashboard-token .marketplace-card,
+.app-shell.acme-night-mode .dashboard-token .marketplace-card-body,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-footer div,
+.app-shell.acme-night-mode .dashboard-token .report-table td,
+.app-shell.acme-night-mode .dashboard-token .listing-grid td,
+.app-shell.acme-night-mode .dashboard-token .desk-listings td {
+  background:
+    linear-gradient(rgba(44, 255, 130, 0.024) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44, 255, 130, 0.018) 1px, transparent 1px),
+    #2c332f;
+}
+
+.app-shell.acme-night-mode .dashboard-token th,
+.app-shell.acme-night-mode .dashboard-token .listing-grid h3,
+.app-shell.acme-night-mode .dashboard-token .window-title {
+  color: #d6ff74;
+  background:
+    linear-gradient(rgba(44, 255, 130, 0.04) 1px, transparent 1px),
+    #26352b;
+  border-color: #5f7e68;
+}
+
+.app-shell.acme-night-mode .dashboard-token .stat-label,
+.app-shell.acme-night-mode .dashboard-token .portfolio-strip span,
+.app-shell.acme-night-mode .dashboard-token .split-list span,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-intro span,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-footer span,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-table small,
+.app-shell.acme-night-mode .dashboard-token .allocation-legend,
+.app-shell.acme-night-mode .dashboard-token .product-suite strong,
+.app-shell.acme-night-mode .dashboard-token .stake-earn span,
+.app-shell.acme-night-mode .dashboard-token .marketplace-count,
+.app-shell.acme-night-mode .dashboard-token .marketplace-card-body span,
+.app-shell.acme-night-mode .dashboard-token .marketplace-footer,
+.app-shell.acme-night-mode .dashboard-token .roadmap-lede > span,
+.app-shell.acme-night-mode .dashboard-token .roadmap-arc span {
+  color: #9dffbf;
+  text-shadow: none;
+}
+
+.app-shell.acme-night-mode .dashboard-token .stat-help,
+.app-shell.acme-night-mode .dashboard-token .muted,
+.app-shell.acme-night-mode .dashboard-token .report-note,
+.app-shell.acme-night-mode .dashboard-token .portfolio-strip small,
+.app-shell.acme-night-mode .dashboard-token .split-list small,
+.app-shell.acme-night-mode .dashboard-token .product-suite p,
+.app-shell.acme-night-mode .dashboard-token .program-list p,
+.app-shell.acme-night-mode .dashboard-token .manifesto-copy p,
+.app-shell.acme-night-mode .dashboard-token .stake-balance,
+.app-shell.acme-night-mode .dashboard-token .stake-note,
+.app-shell.acme-night-mode .dashboard-token .marketplace-empty,
+.app-shell.acme-night-mode .dashboard-token .roadmap-lede p,
+.app-shell.acme-night-mode .dashboard-token .roadmap-arc p,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-intro p {
+  color: #c7f4d4;
+  text-shadow: none;
+}
+
+.app-shell.acme-night-mode .dashboard-token .stat-value,
+.app-shell.acme-night-mode .dashboard-token .portfolio-strip strong,
+.app-shell.acme-night-mode .dashboard-token .split-list strong,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-intro strong,
+.app-shell.acme-night-mode .dashboard-token .tokenomics-footer strong,
+.app-shell.acme-night-mode .dashboard-token .manifesto-copy h2,
+.app-shell.acme-night-mode .dashboard-token .roadmap-lede h2,
+.app-shell.acme-night-mode .dashboard-token .roadmap-arc h3,
+.app-shell.acme-night-mode .dashboard-token .stake-earn strong,
+.app-shell.acme-night-mode .dashboard-token .marketplace-card h3,
+.app-shell.acme-night-mode .dashboard-token .marketplace-card-body strong,
+.app-shell.acme-night-mode .dashboard-token .product-suite h3,
+.app-shell.acme-night-mode .dashboard-token .program-list h3 {
+  color: #f2fff6;
+}
+
+.app-shell.acme-night-mode .dashboard-token .stake-input-row button,
+.app-shell.acme-night-mode .dashboard-token .stake-actions button,
+.app-shell.acme-night-mode .dashboard-token .desk-listings button,
+.app-shell.acme-night-mode .dashboard-token .mint-max-button {
+  color: #dfffe8;
+  background: #26352b;
+  border-color: #5f7e68;
+  box-shadow:
+    inset 1px 1px 0 rgba(227, 255, 238, 0.12),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.app-shell.acme-night-mode .dashboard-token .product-suite article:nth-child(4n),
+.app-shell.acme-night-mode .dashboard-token .product-suite article:nth-child(4n + 1),
+.app-shell.acme-night-mode .dashboard-token .product-suite article:hover {
+  background:
+    linear-gradient(rgba(214, 255, 116, 0.035) 1px, transparent 1px),
+    #333a35;
+}
+
+.app-shell.acme-night-mode .protocol-intro h3,
+.app-shell.acme-night-mode .protocol-feature-layout h3,
+.app-shell.acme-night-mode .protocol-cta h3,
+.app-shell.acme-night-mode .tokenomics-intro strong,
+.app-shell.acme-night-mode .tokenomics-footer strong {
+  color: #f2fff6;
+}
+
+.app-shell.acme-night-mode .protocol-intro p,
+.app-shell.acme-night-mode .protocol-feature-layout > div:first-child p,
+.app-shell.acme-night-mode .protocol-card p,
+.app-shell.acme-night-mode .protocol-feature-grid p,
+.app-shell.acme-night-mode .protocol-mainnet-card p,
+.app-shell.acme-night-mode .protocol-cta p,
+.app-shell.acme-night-mode .tokenomics-intro p {
+  color: #c7f4d4;
+  text-shadow: none;
+}
+
+.app-shell.acme-night-mode .protocol-card span,
+.app-shell.acme-night-mode .protocol-mainnet-card span,
+.app-shell.acme-night-mode .tokenomics-intro span,
+.app-shell.acme-night-mode .tokenomics-table small,
+.app-shell.acme-night-mode .tokenomics-footer span,
+.app-shell.acme-night-mode .allocation-legend {
+  color: #9dffbf;
+  text-shadow: none;
+}
+
+.app-shell.acme-night-mode .dashboard {
+  scrollbar-color: #2cff82 #020804;
+}
+
+.app-shell.acme-night-mode .dashboard::-webkit-scrollbar-track {
+  background: #020804;
+  border-left-color: #177a3c;
+}
+
+.app-shell.acme-night-mode .dashboard::-webkit-scrollbar-thumb {
+  background: #2cff82;
+  border-color: #062411;
+  box-shadow: 0 0 10px rgba(44, 255, 130, 0.62);
+}
+
+.app-shell.acme-night-mode .side-brand,
+.app-shell.acme-night-mode .side-nav button.active,
+.app-shell.acme-night-mode .tabs .active,
+.app-shell.acme-night-mode .mobile-menu button.active,
+.app-shell.acme-night-mode .wallet-disconnect-button,
+.app-shell.acme-night-mode .protocol-actions a,
+.app-shell.acme-night-mode .protocol-mainnet-card a,
+.app-shell.acme-night-mode .protocol-mainnet-card button,
+.app-shell.acme-night-mode .win-button {
+  color: #031107;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px 4px),
+    #2cff82;
+  border-color: #cffff0;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.54),
+    inset -2px -2px 0 rgba(1, 12, 5, 0.58),
+    0 0 15px rgba(44, 255, 130, 0.28);
+  text-shadow: none;
+}
+
+.app-shell.acme-night-mode .side-nav button,
+.app-shell.acme-night-mode .side-nav a,
+.app-shell.acme-night-mode .tabs button,
+.app-shell.acme-night-mode .mobile-menu button,
+.app-shell.acme-night-mode .wallet-menu button,
+.app-shell.acme-night-mode .protocol-actions button,
+.app-shell.acme-night-mode .documentation-tabs button {
+  color: #dfffe8;
+  background: #06170c;
+  border-color: #177a3c;
+  box-shadow: inset 0 0 0 1px rgba(206, 255, 222, 0.08), 0 0 10px rgba(44, 255, 130, 0.1);
+}
+
+.app-shell.acme-night-mode .side-nav button:hover,
+.app-shell.acme-night-mode .side-nav a:hover,
+.app-shell.acme-night-mode .tabs button:hover,
+.app-shell.acme-night-mode .mobile-menu button:hover,
+.app-shell.acme-night-mode .wallet-menu button:not(:disabled):hover,
+.app-shell.acme-night-mode .protocol-actions button:hover,
+.app-shell.acme-night-mode .documentation-tabs button:hover {
+  color: #031107;
+  background: #2cff82;
+  border-color: #dfffe8;
+  text-shadow: none;
+}
+
+.app-shell.acme-night-mode .masthead h1,
+.app-shell.acme-night-mode .documentation-hero h2,
+.app-shell.acme-night-mode .token-locked-placeholder h2,
+.app-shell.acme-night-mode .protocol-intro h3,
+.app-shell.acme-night-mode .protocol-feature-layout h3,
+.app-shell.acme-night-mode .protocol-cta h3,
+.app-shell.acme-night-mode .stat-value,
+.app-shell.acme-night-mode .dashboard-token .panel .stat-value,
+.app-shell.acme-night-mode .documentation-reader-summary strong,
+.app-shell.acme-night-mode .protocol-card span,
+.app-shell.acme-night-mode .protocol-preview h3 span,
+.app-shell.acme-night-mode .protocol-team span,
+.app-shell.acme-night-mode .report-tx-link:hover {
+  color: #9dffbf;
+  text-shadow:
+    0 0 3px rgba(220, 255, 232, 0.8),
+    0 0 12px rgba(44, 255, 130, 0.42);
+}
+
+.app-shell.acme-night-mode .ticker,
+.app-shell.acme-night-mode .window-title,
+.app-shell.acme-night-mode .stat-label,
+.app-shell.acme-night-mode .documentation-hero span,
+.app-shell.acme-night-mode .token-locked-placeholder span,
+.app-shell.acme-night-mode .protocol-hero-copy span,
+.app-shell.acme-night-mode .protocol-mainnet-card span,
+.app-shell.acme-night-mode .side-wallet > span,
+.app-shell.acme-night-mode .terminal-footer,
+.app-shell.acme-night-mode .muted,
+.app-shell.acme-night-mode .report-note {
+  color: #64ff99;
+  text-shadow: 0 0 7px rgba(44, 255, 130, 0.5);
+}
+
+.app-shell.acme-night-mode .masthead p,
+.app-shell.acme-night-mode .stat-help,
+.app-shell.acme-night-mode .protocol-intro p,
+.app-shell.acme-night-mode .protocol-feature-layout > div:first-child p,
+.app-shell.acme-night-mode .protocol-cta p,
+.app-shell.acme-night-mode .protocol-card p,
+.app-shell.acme-night-mode .protocol-feature-grid p,
+.app-shell.acme-night-mode .protocol-preview p,
+.app-shell.acme-night-mode .protocol-team p,
+.app-shell.acme-night-mode .protocol-mainnet-card p,
+.app-shell.acme-night-mode .documentation-hero p,
+.app-shell.acme-night-mode .token-locked-placeholder p,
+.app-shell.acme-night-mode .documentation-reader-summary p,
+.app-shell.acme-night-mode .protocol-proof span,
+.app-shell.acme-night-mode .wallet-menu small {
+  color: #bdfed1;
+}
+
+.app-shell.acme-night-mode .protocol-hero {
+  border-color: #177a3c;
+  box-shadow: 0 0 24px rgba(44, 255, 130, 0.16), inset 0 0 0 1px rgba(206, 255, 222, 0.1);
+}
+
+.app-shell.acme-night-mode .protocol-hero::after {
+  background:
+    linear-gradient(90deg, rgba(0, 8, 3, 0.94), rgba(0, 8, 3, 0.48) 54%, rgba(0, 8, 3, 0.92)),
+    repeating-linear-gradient(0deg, rgba(44, 255, 130, 0.11) 0 1px, transparent 1px 4px);
+}
+
+.app-shell.acme-night-mode .protocol-hero-copy {
+  color: #dfffe8;
+  text-shadow:
+    0 0 6px rgba(44, 255, 130, 0.6),
+    2px 2px 0 #010604;
+}
+
+.app-shell.acme-night-mode .home-typed-headline span,
+.app-shell.acme-night-mode .dashboard-docs .documentation-typed span,
+.app-shell.acme-night-mode .dashboard-token .wallet-required-typed span {
+  border-right-color: #2cff82;
+}
+
+.app-shell.acme-night-mode .documentation-caret,
+.app-shell.acme-night-mode .wallet-required-caret {
+  border-color: #2cff82;
+}
+
+.app-shell.acme-night-mode .skeleton-line {
+  background:
+    linear-gradient(90deg, rgba(44, 255, 130, 0.08), rgba(44, 255, 130, 0.34), rgba(44, 255, 130, 0.08));
+}
+
+.app-shell.theme-glitching {
+  animation: acme-theme-jolt 0.76s steps(2, end);
+}
+
+.app-shell.theme-glitching .dashboard,
+.app-shell.theme-glitching .side-column,
+.app-shell.theme-glitching .side-wallet {
+  animation: acme-theme-skew 0.76s steps(2, end);
+}
+
+.app-shell.theme-glitching::before {
+  content: "ACME MODE";
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: grid;
+  place-items: center;
+  color: rgba(223, 255, 232, 0.76);
+  font-size: clamp(34px, 9vw, 96px);
+  font-weight: 900;
+  letter-spacing: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(44, 255, 130, 0.16) 0 2px, transparent 2px 7px),
+    rgba(1, 6, 4, 0.16);
+  mix-blend-mode: screen;
+  text-shadow:
+    -7px 0 0 rgba(255, 0, 80, 0.45),
+    7px 0 0 rgba(0, 255, 255, 0.45),
+    0 0 18px rgba(44, 255, 130, 0.72);
+  animation: acme-theme-glitch 0.76s steps(6, end) forwards;
+}
+
+@keyframes acme-theme-jolt {
+  0% { filter: none; }
+  12% { filter: hue-rotate(35deg) contrast(1.45) brightness(1.25); }
+  24% { filter: hue-rotate(-20deg) contrast(1.2) brightness(0.86); }
+  38% { filter: contrast(1.7) saturate(1.7); }
+  100% { filter: none; }
+}
+
+@keyframes acme-theme-skew {
+  0%, 100% { transform: none; }
+  18% { transform: translateX(-5px); }
+  32% { transform: translateX(4px) skewX(-1.2deg); }
+  48% { transform: translateX(-2px) skewX(0.8deg); }
+}
+
+@keyframes acme-theme-glitch {
+  0% { opacity: 0; clip-path: inset(0 0 88% 0); transform: translateX(-12px); }
+  12% { opacity: 1; clip-path: inset(12% 0 58% 0); transform: translateX(10px); }
+  24% { clip-path: inset(64% 0 12% 0); transform: translateX(-7px); }
+  38% { clip-path: inset(26% 0 36% 0); transform: translateX(5px); }
+  56% { clip-path: inset(4% 0 74% 0); transform: translateX(-3px); }
+  76% { opacity: 0.88; clip-path: inset(0 0 0 0); transform: none; }
+  100% { opacity: 0; clip-path: inset(0 0 0 0); }
+}
+
+@media (max-width: 640px) {
+  .mobile-acme-mode {
+    position: relative;
+    display: grid;
+    grid-column: auto;
+    min-width: 0;
+    width: 34px;
+    height: 100%;
+    justify-self: stretch;
+    align-self: stretch;
+    place-items: stretch;
+  }
+
+  .mobile-acme-mode .acme-mode-toggle {
+    grid-template-columns: 1fr;
+    place-items: center;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    min-height: 34px;
+    padding: 3px;
+    font-size: 7.5px;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .mobile-acme-mode .acme-mode-toggle::before,
+  .mobile-acme-mode .acme-mode-toggle span {
+    display: none;
+  }
+
+  .mobile-acme-mode .acme-mode-toggle strong {
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    line-height: 1;
+    background: transparent;
+    border: 0;
+  }
 }
